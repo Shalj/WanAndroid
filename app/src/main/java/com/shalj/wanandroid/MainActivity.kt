@@ -3,6 +3,18 @@ package com.shalj.wanandroid
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDeepLink
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,13 +35,13 @@ class MainActivity : ComponentActivity() {
             WanAndroidTheme {
                 val appNavController = rememberNavController()
                 NavHost(navController = appNavController, startDestination = AppRoute.mainScreen) {
-                    composable(AppRoute.startScreen) {
+                    animateComposable(AppRoute.startScreen) {
                         StartScreen(appNavController = appNavController)
                     }
-                    composable(AppRoute.mainScreen) {
+                    animateComposable(AppRoute.mainScreen) {
                         MainScreen(navController = appNavController)
                     }
-                    composable(
+                    animateComposable(
                         AppRoute.articleDetail,
                         arguments = listOf(
                             navArgument("link") {
@@ -50,4 +62,30 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+fun NavGraphBuilder.animateComposable(
+    route: String,
+    arguments: List<NamedNavArgument> = emptyList(),
+    deepLinks: List<NavDeepLink> = emptyList(),
+    content: @Composable (NavBackStackEntry) -> Unit
+) {
+    composable(route, arguments, deepLinks, content = {
+        AnimationContent(route == it.destination.route) {
+            content(it)
+        }
+    })
+}
+
+@Composable
+fun AnimationContent(visible: Boolean, content: @Composable AnimatedVisibilityScope.() -> Unit) {
+    val visible by remember {
+        mutableStateOf(visible)
+    }
+    AnimatedVisibility(
+        visible = visible,
+        enter = slideInHorizontally(),
+        exit = slideOutHorizontally(),
+        content = content
+    )
 }
