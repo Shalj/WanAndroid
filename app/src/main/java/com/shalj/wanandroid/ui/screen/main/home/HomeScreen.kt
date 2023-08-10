@@ -1,4 +1,4 @@
-package com.shalj.wanandroid.ui.screen.home
+package com.shalj.wanandroid.ui.screen.main.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -50,14 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.shalj.wanandroid.model.ArticleData
 import com.shalj.wanandroid.model.BannerData
-import com.shalj.wanandroid.route.AppRoute
 import com.shalj.wanandroid.ui.components.WanSnackBar
 import com.shalj.wanandroid.ui.components.banner.Banner
 import com.shalj.wanandroid.ui.components.multistatewidget.MultiStateWidget
@@ -68,7 +66,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    navController: NavController, viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    navigateToArticleDetailScreen: (link: String, title: String) -> Unit
 ) {
     setupLifeCycle(lifecycleOwner = LocalLifecycleOwner.current, viewModel)
 
@@ -101,7 +100,16 @@ fun HomeScreen(
         },
         floatingActionButton = { BackToTopBtn(lazyListState) },
         topBar = { MyTopBar() },
-        content = { Articles(it, uiState, navController, refreshState, articles, lazyListState) }
+        content = {
+            Articles(
+                it,
+                uiState,
+                refreshState,
+                articles,
+                lazyListState,
+                navigateToArticleDetailScreen
+            )
+        }
     )
 }
 
@@ -209,10 +217,10 @@ fun LazyListScope.banner(bannerData: List<BannerData>) {
 fun Articles(
     paddingValues: PaddingValues,
     uiState: HomeState = HomeState(),
-    navController: NavController,
     refreshState: PullRefreshState,
     pageData: LazyPagingItems<ArticleData>,
-    lazyListState: LazyListState
+    lazyListState: LazyListState,
+    navigateToArticleDetailScreen: (link: String, title: String) -> Unit,
 ) {
     MultiStateWidget(
         modifier = Modifier
@@ -236,11 +244,7 @@ fun Articles(
                 ) { index ->
                     pageData[index]?.let { data ->
                         ArticleItem(data) { link ->
-                            navController.navigate(
-                                AppRoute.articleDetail
-                                    .replace("{link}", link)
-                                    .replace("{title}", data.title.orEmpty())
-                            )
+                            navigateToArticleDetailScreen(link, data.title.orEmpty())
                         }
                     }
                 }

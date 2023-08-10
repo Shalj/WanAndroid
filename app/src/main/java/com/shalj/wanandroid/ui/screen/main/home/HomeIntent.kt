@@ -1,4 +1,4 @@
-package com.shalj.wanandroid.ui.screen.home
+package com.shalj.wanandroid.ui.screen.main.home
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager

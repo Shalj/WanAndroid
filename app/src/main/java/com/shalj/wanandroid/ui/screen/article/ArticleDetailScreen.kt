@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.IntOffset
-import androidx.navigation.NavController
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
@@ -29,7 +28,7 @@ import com.shalj.wanandroid.ui.components.WanTopAppBar
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun ArticleDetailScreen(navController: NavController, link: String = "", title: String = "") {
+fun ArticleDetailScreen(link: String = "", title: String = "", back: () -> Unit) {
     val webviewState = rememberWebViewState(url = link)
     var progress by remember {
         mutableFloatStateOf(0f)
@@ -42,7 +41,7 @@ fun ArticleDetailScreen(navController: NavController, link: String = "", title: 
     })
 
     Scaffold(
-        topBar = { WanTopAppBar(title = title) { navController.navigateUp() } }
+        topBar = { WanTopAppBar(title = title, onBackPressed = back) }
     ) { paddingValues ->
         Box(
             modifier = Modifier.padding(paddingValues)

@@ -1,4 +1,4 @@
-package com.shalj.wanandroid.ui.screen.home
+package com.shalj.wanandroid.ui.screen.main.home
 
 import androidx.paging.PagingData
 import com.shalj.wanandroid.model.ArticleData

@@ -1,7 +1,6 @@
 package com.shalj.wanandroid.ui.screen.start
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Arrangement
@@ -30,12 +29,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavOptions
-import androidx.navigation.compose.rememberNavController
 import com.shalj.wanandroid.R
 import com.shalj.wanandroid.base.BaseViewModel
-import com.shalj.wanandroid.route.AppRoute
 import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 import kotlinx.coroutines.delay
 
@@ -43,7 +38,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun StartPreview() {
     WanAndroidTheme {
-        StartScreen(appNavController = rememberNavController())
+        StartScreen{}
     }
 }
 
@@ -69,22 +64,18 @@ fun setupLifeCycle(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StartScreen(
-    appNavController: NavController,
     startViewModel: StartViewModel = hiltViewModel(),
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    navigateToMainScreen: ()->Unit,
 ) {
     val uiState by startViewModel.startUIState.collectAsStateWithLifecycle()
     setupLifeCycle(lifecycleOwner, startViewModel)
 
     LaunchedEffect(Unit) {
         delay(2500)
-        val options = NavOptions.Builder()
-            .setLaunchSingleTop(true)
-            .build()
-        appNavController.navigate(AppRoute.mainScreen, options)
+        navigateToMainScreen()
     }
 
     Column(
