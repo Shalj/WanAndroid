@@ -16,11 +16,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MailOutline
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,8 +27,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.material3.pullrefresh.PullRefreshIndicator
 import androidx.compose.material3.pullrefresh.PullRefreshState
 import androidx.compose.material3.pullrefresh.pullRefresh
@@ -45,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,9 +50,11 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
+import com.shalj.wanandroid.R
 import com.shalj.wanandroid.model.ArticleData
 import com.shalj.wanandroid.model.BannerData
 import com.shalj.wanandroid.ui.components.WanSnackBar
+import com.shalj.wanandroid.ui.components.WanTopAppBar
 import com.shalj.wanandroid.ui.components.banner.Banner
 import com.shalj.wanandroid.ui.components.multistatewidget.MultiStateWidget
 import com.shalj.wanandroid.ui.screen.article.ArticleItem
@@ -66,8 +64,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
+    goSearch: () -> Unit = {},
+    goMe: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
-    navigateToArticleDetailScreen: (link: String, title: String) -> Unit
+    goArticleDetailScreen: (link: String, title: String) -> Unit
 ) {
     setupLifeCycle(lifecycleOwner = LocalLifecycleOwner.current, viewModel)
 
@@ -99,7 +99,7 @@ fun HomeScreen(
             )
         },
         floatingActionButton = { BackToTopBtn(lazyListState) },
-        topBar = { MyTopBar() },
+        topBar = { MyTopBar(goSearch, goMe) },
         content = {
             Articles(
                 it,
@@ -107,30 +107,20 @@ fun HomeScreen(
                 refreshState,
                 articles,
                 lazyListState,
-                navigateToArticleDetailScreen
+                goArticleDetailScreen
             )
         }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTopBar() {
-    TopAppBar(
-        title = { },
-        colors = topAppBarColors(),
-        navigationIcon = {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
-                    imageVector = Icons.Outlined.Menu,
-                    contentDescription = "iconMenu",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        },
+fun MyTopBar(
+    goSearch: () -> Unit,
+    goMe: () -> Unit,
+) {
+    WanTopAppBar(
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = goSearch) {
                 Icon(
                     modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
                     imageVector = Icons.Outlined.Search,
@@ -138,10 +128,10 @@ fun MyTopBar() {
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = goMe) {
                 Icon(
                     modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
-                    imageVector = Icons.Outlined.MailOutline,
+                    painter = painterResource(id = R.drawable.logo),
                     contentDescription = "iconMessage",
                     tint = MaterialTheme.colorScheme.onBackground
                 )
@@ -220,7 +210,7 @@ fun Articles(
     refreshState: PullRefreshState,
     pageData: LazyPagingItems<ArticleData>,
     lazyListState: LazyListState,
-    navigateToArticleDetailScreen: (link: String, title: String) -> Unit,
+    goArticleDetailScreen: (link: String, title: String) -> Unit,
 ) {
     MultiStateWidget(
         modifier = Modifier
@@ -243,9 +233,7 @@ fun Articles(
                     key = { index -> pageData[index]?.id ?: 0 },
                 ) { index ->
                     pageData[index]?.let { data ->
-                        ArticleItem(data) { link ->
-                            navigateToArticleDetailScreen(link, data.title.orEmpty())
-                        }
+                        ArticleItem(data, goArticleDetailScreen)
                     }
                 }
             }
@@ -265,14 +253,14 @@ fun ArticlesPreview() {
     WanAndroidTheme {
         Scaffold(
             floatingActionButton = { BackToTopBtn() },
-            topBar = { MyTopBar() },
+            topBar = { MyTopBar({}, {}) },
             content = {
                 LazyColumn(
                     modifier = Modifier.padding(it),
                     contentPadding = PaddingValues(vertical = 20.dp),
                 ) {
                     items(count = 5) {
-                        ArticleItem {}
+                        ArticleItem { _, _ -> }
                     }
                 }
             }

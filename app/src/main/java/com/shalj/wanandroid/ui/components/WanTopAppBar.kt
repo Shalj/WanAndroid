@@ -1,5 +1,6 @@
 package com.shalj.wanandroid.ui.components
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,11 +15,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 
+/**
+ * @param title 标题，当 <code>[titleWidget] 为 null 时生效
+ * @param titleWidget  标题组件，如果不为 null 则 <code>[title] 不生效
+ * */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WanTopAppBar(title: String, onBackPressed: () -> Unit) {
+fun WanTopAppBar(
+    title: String = "",
+    titleWidget: @Composable (() -> Unit)? = null,
+    navigationIcon: @Composable (() -> Unit)? = null,
+    actions: @Composable RowScope.()->Unit = {},
+    onBackPressed: () -> Unit = { }
+) {
     TopAppBar(
-        title = {
+        title = titleWidget ?: {
             Text(
                 text = title,
                 fontSize = 16.sp,
@@ -28,7 +39,7 @@ fun WanTopAppBar(title: String, onBackPressed: () -> Unit) {
                 overflow = TextOverflow.Ellipsis,
             )
         },
-        navigationIcon = {
+        navigationIcon = navigationIcon ?: {
             IconButton(onClick = onBackPressed) {
                 Icon(Icons.Filled.ArrowBack, "backIcon")
             }
@@ -37,5 +48,6 @@ fun WanTopAppBar(title: String, onBackPressed: () -> Unit) {
             containerColor = MaterialTheme.colorScheme.background,
             titleContentColor = MaterialTheme.colorScheme.background,
         ),
+        actions = actions
     )
 }

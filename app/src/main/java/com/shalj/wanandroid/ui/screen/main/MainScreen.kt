@@ -30,8 +30,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
+    goSearch: () -> Unit = {},
+    goMe: () -> Unit = {},
     mainViewModel: MainViewModel = hiltViewModel(),
-    navigateToArticleDetailScreen: (link: String, title: String) -> Unit
+    goArticleDetailScreen: (link: String, title: String) -> Unit
 ) {
     val items = listOf(
         Pair("主页", R.drawable.ic_main_home),
@@ -41,7 +43,7 @@ fun MainScreen(
     val pagerState = rememberPagerState { items.size }
     val scope = rememberCoroutineScope()
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background.copy(alpha = .8f),
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             NavigationBar {
                 items.mapIndexed { index, pair ->
@@ -63,7 +65,12 @@ fun MainScreen(
                 modifier = Modifier.padding(it)
             ) { index ->
                 when (index) {
-                    0 -> HomeScreen(navigateToArticleDetailScreen = navigateToArticleDetailScreen)
+                    0 -> HomeScreen(
+                        goSearch = goSearch,
+                        goMe = goMe,
+                        goArticleDetailScreen = goArticleDetailScreen
+                    )
+
                     1 -> ProjectScreen()
                     2 -> WechatAccountScreen()
                 }

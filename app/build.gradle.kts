@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.shalj.wanandroid"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.shalj.wanandroid"
@@ -61,6 +61,7 @@ dependencies {
     //compose about
     implementation(libs.hilt.navigation.compose)
     implementation(libs.navigation.compose)
+    implementation(libs.navigation.compose.material)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.runtime.compose)
     //retrofit

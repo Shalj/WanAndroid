@@ -44,14 +44,14 @@ fun Preview() {
                 chapterName = "chapterName",
                 superChapterName = "superChapterName",
             )
-        ) {}
+        ) {_, _ -> }
     }
 }
 
 @Composable
 fun ArticleItem(
     articleData: ArticleData = ArticleData(),
-    onClick: (link: String) -> Unit
+    onClick: (link: String, title: String) -> Unit
 ) {
     var selected by remember {
         mutableStateOf(false)
@@ -62,7 +62,7 @@ fun ArticleItem(
             .padding(horizontal = 16.dp)
             .padding(bottom = 10.dp)
             .clip(RoundedCornerShape(10.dp))
-            .clickable { onClick(articleData.link ?: "") },
+            .clickable { onClick(articleData.link.orEmpty(), articleData.title.orEmpty()) },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 10.dp,
             pressedElevation = 10.dp
