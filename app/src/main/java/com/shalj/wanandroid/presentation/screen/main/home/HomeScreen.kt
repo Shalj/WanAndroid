@@ -61,7 +61,7 @@ import com.shalj.wanandroid.presentation.components.WanTopAppBar
 import com.shalj.wanandroid.presentation.components.banner.Banner
 import com.shalj.wanandroid.presentation.components.multistatewidget.MultiStateWidget
 import com.shalj.wanandroid.presentation.screen.article.ArticleItem
-import com.shalj.wanandroid.presentation.screen.start.setupLifeCycle
+import com.shalj.wanandroid.presentation.screen.start.SetupLifeCycle
 import com.shalj.wanandroid.presentation.theme.WanAndroidTheme
 import kotlinx.coroutines.launch
 
@@ -72,7 +72,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     goArticleDetailScreen: (link: String, title: String) -> Unit
 ) {
-    setupLifeCycle(lifecycleOwner = LocalLifecycleOwner.current, viewModel)
+    SetupLifeCycle(lifecycleOwner = LocalLifecycleOwner.current, viewModel)
 
     //ui状态？
     val uiState by viewModel.uiState.collectAsStateWithLifecycle(HomeState())
@@ -110,7 +110,10 @@ fun HomeScreen(
                 refreshState,
                 articles,
                 lazyListState,
-                goArticleDetailScreen
+                goArticleDetailScreen,
+                collectArticle = { articleData ->
+                    viewModel.onEvent(HomeEvent.CollectArticle(articleData))
+                }
             )
         }
     )
@@ -223,6 +226,7 @@ fun Articles(
     pageData: LazyPagingItems<ArticleData>,
     lazyListState: LazyListState,
     goArticleDetailScreen: (link: String, title: String) -> Unit,
+    collectArticle: (articleData: ArticleData) -> Unit,
 ) {
     MultiStateWidget(
         modifier = Modifier
@@ -245,7 +249,7 @@ fun Articles(
                     key = { index -> pageData[index]?.id ?: 0 },
                 ) { index ->
                     pageData[index]?.let { data ->
-                        ArticleItem(data, goArticleDetailScreen)
+                        ArticleItem(data, collectArticle, goArticleDetailScreen)
                     }
                 }
             }

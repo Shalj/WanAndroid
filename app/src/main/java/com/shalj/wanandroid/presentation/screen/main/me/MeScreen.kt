@@ -32,7 +32,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shalj.wanandroid.R
+import com.shalj.wanandroid.model.LoginResp
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
 import com.shalj.wanandroid.presentation.theme.WanAndroidTheme
 
@@ -47,6 +50,7 @@ fun MeScreenPreview() {
 
 @Composable
 fun MeScreen(
+    viewModel: MeIntent = hiltViewModel(),
     login: () -> Unit = {},
     goMessage: () -> Unit = {},
     goCollect: () -> Unit = {},
@@ -78,7 +82,7 @@ fun MeScreen(
                     .fillMaxSize()
                     .padding(it)
             ) {
-                MeInfo(login)
+                MeInfo(viewModel, login)
                 SettingContent()
             }
         }
@@ -86,7 +90,10 @@ fun MeScreen(
 }
 
 @Composable
-private fun MeInfo(login: () -> Unit) {
+private fun MeInfo(viewModel: MeIntent, login: () -> Unit) {
+
+    val userInfo by viewModel.userInfo.collectAsStateWithLifecycle(initialValue = LoginResp())
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -110,8 +117,8 @@ private fun MeInfo(login: () -> Unit) {
                 .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Shalj", fontSize = 24.sp)
-            Text(text = "ID:", fontSize = 14.sp)
+            Text(text = userInfo.nickname.orEmpty(), fontSize = 24.sp)
+            Text(text = "ID:${userInfo.id.toString()}", fontSize = 14.sp)
             Text(text = "积分：等级：排名", fontSize = 14.sp)
         }
     }

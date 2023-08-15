@@ -4,6 +4,7 @@ import com.shalj.wanandroid.base.BaseResponse
 import com.shalj.wanandroid.base.PageResponse
 import com.shalj.wanandroid.model.ArticleData
 import com.shalj.wanandroid.model.BannerData
+import com.shalj.wanandroid.model.LoginResp
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -19,11 +20,17 @@ interface ApiService {
         @Query("page_size") pageSize: Int = 20
     ): BaseResponse<PageResponse<ArticleData>>
 
+    @POST("/lg/collect/{id}/json")
+    suspend fun collectArticle(@Path("id") id: Int): BaseResponse<Any>
+
+    @POST("/lg/uncollect_originId/{id}/json")
+    suspend fun unCollectArticle(@Path("id") id: Int): BaseResponse<Any>
+
     @GET("/banner/json")
     suspend fun getBannerData(): BaseResponse<List<BannerData>>
 
     @POST("/user/login")
-    suspend fun login(@Body body: RequestBody): BaseResponse<Any>
+    suspend fun login(@Body body: RequestBody): BaseResponse<LoginResp>
 
     @POST("/user/register")
     suspend fun register(@Body body: RequestBody): BaseResponse<Any>

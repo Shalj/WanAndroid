@@ -20,6 +20,7 @@ fun Any.createBody(): RequestBody {
 }
 
 fun Any.toJson() = Gson().toJson(this)
+inline fun <reified T> String.toModel() = Gson().fromJson(this, T::class.java)
 
 //通用的异常处理
 inline fun <reified T> withRequestResult(io: () -> RequestResult<T>): RequestResult<T> =

@@ -8,7 +8,7 @@ data class ArticleData(
     val canEdit: Boolean? = false,
     val chapterId: Int? = 0,
     val chapterName: String? = "",
-    val collect: Boolean? = false,
+    var collect: Boolean? = false,
     val courseId: Int? = 0,
     val desc: String? = "",
     val descMd: String? = "",

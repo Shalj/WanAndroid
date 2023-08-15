@@ -38,12 +38,12 @@ import kotlinx.coroutines.delay
 @Composable
 fun StartPreview() {
     WanAndroidTheme {
-        StartScreen{}
+        StartScreen {}
     }
 }
 
 @Composable
-fun setupLifeCycle(
+fun SetupLifeCycle(
     lifecycleOwner: LifecycleOwner,
     viewModel: BaseViewModel,
 ) {
@@ -68,10 +68,10 @@ fun setupLifeCycle(
 fun StartScreen(
     startViewModel: StartViewModel = hiltViewModel(),
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    navigateToMainScreen: ()->Unit,
+    navigateToMainScreen: () -> Unit,
 ) {
     val uiState by startViewModel.startUIState.collectAsStateWithLifecycle()
-    setupLifeCycle(lifecycleOwner, startViewModel)
+    SetupLifeCycle(lifecycleOwner, startViewModel)
 
     LaunchedEffect(Unit) {
         delay(2500)
@@ -100,7 +100,7 @@ fun StartScreen(
             enter = expandVertically(expandFrom = Alignment.Bottom) + fadeIn(initialAlpha = 0.1f),
         ) {
             Text(
-                text = "玩安卓",
+                text = "坚持下去，你就是下一个大牛！",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.secondary

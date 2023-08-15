@@ -10,7 +10,7 @@ activity-compose = "1.7.2"
 compose-bom = "2023.06.01"
 
 #datastore
-datastore-preferences-core = "1.0.0"
+datastore-preferences = "1.0.0"
 #hilt
 hilt-android = "2.44"
 hilt-android-compiler = "2.44"
@@ -37,7 +37,7 @@ paging-compose = "3.2.0"
 
 [libraries]
 #data store
-datastore = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore-preferences-core" }
+datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore-preferences" }
 #hile
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt-android" }
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt-android-compiler" }

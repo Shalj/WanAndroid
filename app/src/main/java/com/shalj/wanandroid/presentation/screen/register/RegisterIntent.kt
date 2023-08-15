@@ -15,7 +15,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterIntent @Inject constructor() : BaseViewModel() {
+class RegisterIntent @Inject constructor(
+    private val api: Api
+) : BaseViewModel() {
     private val _username = MutableStateFlow("")
     private val _password = MutableStateFlow("")
     private val _rePassword = MutableStateFlow("")
@@ -47,7 +49,7 @@ class RegisterIntent @Inject constructor() : BaseViewModel() {
         _showLoading.value = true
         viewModelScope.launch {
             val result =
-                Api.register(_username.value, _password.value, _rePassword.value, _verifyCode.value)
+                api.register(_username.value, _password.value, _rePassword.value, _verifyCode.value)
             _showLoading.value = false
             when (result) {
                 is RequestResult.Error -> withContext(Dispatchers.Main) {

@@ -1,9 +1,14 @@
 package com.shalj.wanandroid.presentation.screen.login
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.viewModelScope
 import com.shalj.wanandroid.base.BaseViewModel
+import com.shalj.wanandroid.di.userInfoKey
 import com.shalj.wanandroid.net.Api
 import com.shalj.wanandroid.net.RequestResult
+import com.shalj.wanandroid.net.toJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +20,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginIntent @Inject constructor() : BaseViewModel() {
+class LoginIntent @Inject constructor(
+    private val userDataStore: DataStore<Preferences>,
+    private val api: Api,
+) : BaseViewModel() {
     private val _username = MutableStateFlow("shalj")
     private val _password = MutableStateFlow("shalj123")
     private val _loginSuccess = MutableStateFlow(false)
@@ -42,7 +50,7 @@ class LoginIntent @Inject constructor() : BaseViewModel() {
     fun login() {
         _showLoading.value = true
         viewModelScope.launch {
-            val result = Api.login(_username.value, _password.value)
+            val result = api.login(_username.value, _password.value)
             _showLoading.value = false
             when (result) {
                 is RequestResult.Error -> withContext(Dispatchers.Main) {
@@ -50,7 +58,11 @@ class LoginIntent @Inject constructor() : BaseViewModel() {
                 }
 
                 is RequestResult.Success -> withContext(Dispatchers.Main) {
-                    //todo 保存登录信息
+                    //保存登录信息
+                    userDataStore.edit { settings ->
+                        settings[userInfoKey] =
+                            result.data.apply { password = _password.value }.toJson()
+                    }
                     _loginSuccess.value = true
                 }
             }

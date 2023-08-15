@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 
 class HomePagingSource(
+    private val api: Api,
     private val multiState: MutableStateFlow<MultiStateWidgetState>,
     private val errorMsg: MutableStateFlow<String>
 ) : PagingSource<Int, ArticleData>() {
@@ -21,7 +22,7 @@ class HomePagingSource(
 
             val nextPage = params.key ?: 0
 
-            when (val result = Api.getHomeArticleList(nextPage)) {
+            when (val result = api.getHomeArticleList(nextPage, params.loadSize)) {
                 is RequestResult.Error -> withContext(Dispatchers.Main) {
                     errorMsg.value = result.msg
                     multiState.value = MultiStateWidgetState.Error

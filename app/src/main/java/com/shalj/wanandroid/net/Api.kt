@@ -2,12 +2,21 @@ package com.shalj.wanandroid.net
 
 import okhttp3.MultipartBody
 
-object Api {
-    private val service = RetrofitHelper.create<ApiService>()
+class Api(private val service: ApiService) {
 
     //获取首页文章列表
-    suspend fun getHomeArticleList(page: Int) = withRequestResult {
-        service.getHomeArticleList(page).handleResponse()
+    suspend fun getHomeArticleList(page: Int, pageSize: Int = 20) = withRequestResult {
+        service.getHomeArticleList(page, pageSize).handleResponse()
+    }
+
+    //收藏文章
+    suspend fun collectArticle(id: Int) = withRequestResult {
+        service.collectArticle(id).handleResponse()
+    }
+
+    //取消收藏文章
+    suspend fun unCollectArticle(id: Int) = withRequestResult {
+        service.unCollectArticle(id).handleResponse()
     }
 
     //获取首页banner信息
