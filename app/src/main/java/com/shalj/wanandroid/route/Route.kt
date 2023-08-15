@@ -4,11 +4,14 @@ object Route {
     const val startScreen = "/startScreen"
     const val mainScreen = "/mainScreen"
     const val articleDetail = "/articleDetail?link={link}&title={title}"
+
     const val meScreen = "/meScreen"
 
-    fun horizontalValues() = listOf(startScreen, mainScreen, articleDetail)
-    fun verticalValues() = listOf(meScreen)
 }
+
+val horizontalValues =
+    listOf(LoginRoute.register, Route.startScreen, Route.mainScreen, Route.articleDetail)
+val verticalValues = listOf(LoginRoute.login, Route.meScreen)
 
 object LoginRoute {
     const val root = "/login"

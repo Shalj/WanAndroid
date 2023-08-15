@@ -1,5 +1,7 @@
 package com.shalj.wanandroid.net
 
+import okhttp3.MultipartBody
+
 object Api {
     private val service = RetrofitHelper.create<ApiService>()
 
@@ -12,4 +14,30 @@ object Api {
     suspend fun getBannerData() = withRequestResult {
         service.getBannerData().handleResponse()
     }
+
+    suspend fun login(username: String, password: String) = withRequestResult {
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("username", username)
+            .addFormDataPart("password", password)
+            .build()
+        service.login(requestBody).handleResponse()
+    }
+
+    suspend fun register(
+        username: String,
+        password: String,
+        rePassword: String,
+        verifyCode: String
+    ) =
+        withRequestResult {
+            val requestBody = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("username", username)
+                .addFormDataPart("password", password)
+                .addFormDataPart("rePassword", rePassword)
+                .addFormDataPart("code", verifyCode)
+                .build()
+            service.register(requestBody).handleResponse()
+        }
 }

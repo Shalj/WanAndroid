@@ -3,7 +3,7 @@ package com.shalj.wanandroid
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.shalj.wanandroid.ui.screen.main.App
+import com.shalj.wanandroid.presentation.screen.main.App
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

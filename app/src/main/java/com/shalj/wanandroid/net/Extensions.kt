@@ -1,9 +1,25 @@
 package com.shalj.wanandroid.net
 
+import com.google.gson.Gson
 import com.shalj.wanandroid.base.BaseResponse
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+
+//上传文件媒体格式
+val mediaTypeJson = "application/json; charset=utf-8".toMediaTypeOrNull()
+val mediaTypeForm = "multipart/form-data; charset=utf-8".toMediaTypeOrNull()
+val mediaTypeFormStream = "application/otcet-stream; charset=utf-8".toMediaTypeOrNull()
+
+//创建post body
+fun Any.createBody(): RequestBody {
+    return toJson().toRequestBody(mediaTypeJson)
+}
+
+fun Any.toJson() = Gson().toJson(this)
 
 //通用的异常处理
 inline fun <reified T> withRequestResult(io: () -> RequestResult<T>): RequestResult<T> =
@@ -11,7 +27,7 @@ inline fun <reified T> withRequestResult(io: () -> RequestResult<T>): RequestRes
         io()
     } catch (e: Exception) {
         e.printStackTrace()
-        RequestResult.Error("请求失败")
+        ExceptionHandler.handleError(e)
     }
 
 //通用的返回错误码处理处理
