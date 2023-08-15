@@ -27,36 +27,29 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     @Singleton
-    fun provideOkHttpClient(
-        @ApplicationContext context: Context,
-    ): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .addInterceptor(HeaderInterceptor(context))
-            .build()
-    }
+    fun provideOkHttpClient(@ApplicationContext context: Context) = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .addInterceptor(HeaderInterceptor(context))
+        .build()
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl("https://www.wanandroid.com")
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+        .baseUrl("https://www.wanandroid.com")
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     @Provides
     @Singleton
-    fun provideApi(retrofit: Retrofit): Api {
-        return Api(retrofit.create(ApiService::class.java))
-    }
+    fun provideApi(retrofit: Retrofit) = Api(retrofit.create(ApiService::class.java))
+
 }
 
 val loggingInterceptor = HttpLoggingInterceptor(
     object : HttpLoggingInterceptor.Logger {
         override fun log(message: String) {
-            logE("RetrofitHelper", "message:$message")
+            logE("NetworkModule", "message:$message")
         }
     }
 ).apply { level = HttpLoggingInterceptor.Level.BODY }
@@ -64,11 +57,12 @@ val loggingInterceptor = HttpLoggingInterceptor(
 class HeaderInterceptor(private val context: Context) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val userInfo = runBlocking {
-            context.userDataStore.data.map {
-                it[userInfoKey]
-            }.firstOrNull().orEmpty().ifEmpty { "{}" }.toModel<LoginResp>()
+            context.userDataStore.data.map { it[userInfoKey] }
+                .firstOrNull()
+                .orEmpty()
+                .ifEmpty { "{}" }
+                .toModel<LoginResp>()
         }
-        logE("HeaderInterceptor", "=============userInfo:$userInfo")
         return chain.proceed(
             chain.request().newBuilder()
                 .addHeader("Cookie", "loginUserName=${userInfo.username}")
