@@ -4,14 +4,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.shalj.wanandroid.base.BaseViewModel
 import com.shalj.wanandroid.di.userInfoKey
-import com.shalj.wanandroid.model.LoginResp
+import com.shalj.wanandroid.domain.LoginResp
 import com.shalj.wanandroid.net.toModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
-class MeIntent @Inject constructor(
+class MeVM @Inject constructor(
     dataStore: DataStore<Preferences>
 ) : BaseViewModel() {
 

@@ -31,7 +31,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shalj.wanandroid.R
 import com.shalj.wanandroid.base.BaseViewModel
-import com.shalj.wanandroid.presentation.theme.WanAndroidTheme
+import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 import kotlinx.coroutines.delay
 
 @Preview(showBackground = true)

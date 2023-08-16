@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginIntent @Inject constructor(
+class LoginVM @Inject constructor(
     private val userDataStore: DataStore<Preferences>,
     private val api: Api,
 ) : BaseViewModel() {

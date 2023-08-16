@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.android)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     alias(libs.plugins.com.google.dagger.hilt.android)
+    alias(libs.plugins.com.google.devtools.ksp)
 }
 
 android {
@@ -61,7 +62,6 @@ dependencies {
     //compose about
     implementation(libs.hilt.navigation.compose)
     implementation(libs.navigation.compose)
-    implementation(libs.navigation.compose.material)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.runtime.compose)
     //retrofit
@@ -77,6 +77,11 @@ dependencies {
     //paging
     implementation(libs.paging.runtime)
     implementation(libs.paging.compose)
+    //room database
+    implementation(libs.room)
+    implementation(libs.room.paging)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)

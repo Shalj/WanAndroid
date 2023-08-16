@@ -1,4 +1,4 @@
-package com.shalj.wanandroid.presentation.theme
+package com.shalj.wanandroid.ui.theme
 
 import android.app.Activity
 import android.os.Build

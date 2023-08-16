@@ -2,9 +2,9 @@ package com.shalj.wanandroid.net
 
 import com.shalj.wanandroid.base.BaseResponse
 import com.shalj.wanandroid.base.PageResponse
-import com.shalj.wanandroid.model.ArticleData
-import com.shalj.wanandroid.model.BannerData
-import com.shalj.wanandroid.model.LoginResp
+import com.shalj.wanandroid.domain.ArticleData
+import com.shalj.wanandroid.domain.BannerData
+import com.shalj.wanandroid.domain.LoginResp
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET

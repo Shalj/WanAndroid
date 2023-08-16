@@ -2,21 +2,25 @@ package com.shalj.wanandroid.presentation.screen.main.home
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.shalj.wanandroid.base.BaseViewModel
-import com.shalj.wanandroid.model.ArticleData
-import com.shalj.wanandroid.model.BannerData
+import com.shalj.wanandroid.data.local.ArticleDatabase
+import com.shalj.wanandroid.data.local.ArticleEntity
+import com.shalj.wanandroid.data.mappers.toArticleData
+import com.shalj.wanandroid.data.mappers.toArticleEntity
+import com.shalj.wanandroid.domain.ArticleData
+import com.shalj.wanandroid.domain.BannerData
 import com.shalj.wanandroid.net.Api
 import com.shalj.wanandroid.net.RequestResult
 import com.shalj.wanandroid.presentation.components.multistatewidget.MultiStateWidgetState
+import com.shalj.wanandroid.toast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,23 +28,25 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val api: Api
+    private val api: Api,
+    pager: Pager<Int, ArticleEntity>,
+    private val articleDb: ArticleDatabase,
 ) : BaseViewModel() {
 
     private val _multiState = MutableStateFlow<MultiStateWidgetState>(MultiStateWidgetState.Loading)
-    private val _errorMsg = MutableStateFlow("")
 
     private val _banner = MutableStateFlow(listOf<BannerData>())
 
-    var articles = Pager(
-        config = PagingConfig(pageSize = 20, initialLoadSize = 60),
-        pagingSourceFactory = { HomePagingSource(api, _multiState, _errorMsg) },
-    ).flow.cachedIn(viewModelScope)
+    val articles = pager.flow.map { pagingData ->
+        pagingData.map { article ->
+            article.toArticleData()
+        }
+    }.cachedIn(viewModelScope)
 
     val uiState = combine(
-        _multiState, _banner, _errorMsg
-    ) { refreshing, banner, errorMsg ->
-        HomeState(refreshing, banner, errorMsg)
+        _multiState, _banner,
+    ) { refreshing, banner ->
+        HomeState(refreshing, banner)
     }.shareIn(viewModelScope, started = SharingStarted.WhileSubscribed())
 
     init {
@@ -75,7 +81,7 @@ class HomeViewModel @Inject constructor(
             }
 
             when (result) {
-                is RequestResult.Error -> _errorMsg.value = result.msg
+                is RequestResult.Error -> toast.value = result.msg
                 is RequestResult.Success -> {
                     articleData.collect = !(articleData.collect ?: false)
                     updateArticles(articleData)
@@ -86,15 +92,7 @@ class HomeViewModel @Inject constructor(
 
     private fun updateArticles(articleData: ArticleData) {
         viewModelScope.launch {
-            articles.onEach { pagingData ->
-                pagingData.map { article ->
-                    if (article.id == articleData.id) {
-                        article.copy(collect = articleData.collect)
-                    } else {
-                        article
-                    }
-                }
-            }
+            articleDb.dao.update(articleData.toArticleEntity())
         }
     }
 }

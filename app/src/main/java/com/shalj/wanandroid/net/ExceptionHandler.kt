@@ -15,30 +15,30 @@ object ExceptionHandler {
 
     fun handleError(throwable: Throwable?): RequestResult<Nothing> =
         when (throwable) {
-            is ConnectException -> RequestResult.Error(UNKNOWN_ERROR)
+            is ConnectException -> RequestResult.Error(UNKNOWN_ERROR, throwable)
 
-            is SocketTimeoutException -> RequestResult.Error(TIME_OUT)
+            is SocketTimeoutException -> RequestResult.Error(TIME_OUT, throwable)
 
             is HttpException -> when (throwable.code()) {
                 401, 403 -> {
-                    RequestResult.Error(TOKEN_EXPIRED)
+                    RequestResult.Error(TOKEN_EXPIRED, throwable)
                 }
 
-                404 -> RequestResult.Error(NOT_FOUND)
+                404 -> RequestResult.Error(NOT_FOUND, throwable)
 
                 500 -> throwable.response()?.errorBody()?.let {
                     val data = Gson().fromJson(it.string(), BaseResponse::class.java)
                     try {
-                        RequestResult.Error(data?.errorMsg ?: UNKNOWN_ERROR)
+                        RequestResult.Error(data?.errorMsg ?: UNKNOWN_ERROR, throwable)
                     } catch (e: Exception) {
-                        RequestResult.Error(UNKNOWN_ERROR)
+                        RequestResult.Error(UNKNOWN_ERROR, throwable)
                     }
-                } ?: RequestResult.Error(throwable.message.orEmpty().ifEmpty { UNKNOWN_ERROR })
+                } ?: RequestResult.Error(throwable.message.orEmpty().ifEmpty { UNKNOWN_ERROR }, throwable)
 
-                else -> RequestResult.Error(throwable.message.orEmpty().ifEmpty { UNKNOWN_ERROR })
+                else -> RequestResult.Error(throwable.message.orEmpty().ifEmpty { UNKNOWN_ERROR }, throwable)
             }
 
-            else -> RequestResult.Error(throwable?.message.orEmpty().ifEmpty { UNKNOWN_ERROR })
+            else -> RequestResult.Error(throwable?.message.orEmpty().ifEmpty { UNKNOWN_ERROR }, throwable)
         }
 
 }

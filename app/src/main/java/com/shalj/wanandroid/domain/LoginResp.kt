@@ -1,4 +1,4 @@
-package com.shalj.wanandroid.model
+package com.shalj.wanandroid.domain
 
 data class LoginResp(
     val admin: Boolean? = false,

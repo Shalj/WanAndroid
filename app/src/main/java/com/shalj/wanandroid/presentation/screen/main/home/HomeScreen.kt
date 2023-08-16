@@ -5,6 +5,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,15 +21,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.pullrefresh.PullRefreshIndicator
 import androidx.compose.material3.pullrefresh.PullRefreshState
 import androidx.compose.material3.pullrefresh.pullRefresh
@@ -54,15 +54,15 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.shalj.wanandroid.R
-import com.shalj.wanandroid.model.ArticleData
-import com.shalj.wanandroid.model.BannerData
-import com.shalj.wanandroid.presentation.components.WanSnackBar
+import com.shalj.wanandroid.domain.ArticleData
+import com.shalj.wanandroid.domain.BannerData
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
 import com.shalj.wanandroid.presentation.components.banner.Banner
 import com.shalj.wanandroid.presentation.components.multistatewidget.MultiStateWidget
+import com.shalj.wanandroid.presentation.components.multistatewidget.MultiStateWidgetState
 import com.shalj.wanandroid.presentation.screen.article.ArticleItem
 import com.shalj.wanandroid.presentation.screen.start.SetupLifeCycle
-import com.shalj.wanandroid.presentation.theme.WanAndroidTheme
+import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -83,28 +83,14 @@ fun HomeScreen(
         refreshing = articles.loadState.refresh == LoadState.Loading,
         onRefresh = { articles.refresh() },
     )
-    val snackbarHostState = remember { SnackbarHostState() }
     val lazyListState = rememberLazyListState()
 
     Scaffold(
         contentColor = MaterialTheme.colorScheme.background,
-        snackbarHost = {
-            WanSnackBar(
-                modifier = Modifier
-                    .padding(bottom = 40.dp)
-                    .padding(horizontal = 32.dp),
-                snackbarHostState = snackbarHostState,
-                action = {
-                    TextButton(onClick = { snackbarHostState.currentSnackbarData?.dismiss() }) {
-                        Text(text = "关闭")
-                    }
-                },
-            )
-        },
         floatingActionButton = { BackToTopBtn(lazyListState) },
         topBar = { MyTopBar(goSearch, goMe) },
         content = {
-            Articles(
+            HomeContent(
                 it,
                 uiState,
                 refreshState,
@@ -148,7 +134,6 @@ fun MyTopBar(
                     modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
                     painter = painterResource(id = R.drawable.ic_avatar),
                     contentDescription = "iconUser",
-//                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
@@ -193,14 +178,13 @@ fun BackToTopBtn(lazyListState: LazyListState = rememberLazyListState()) {
 }
 
 fun LazyListScope.banner(bannerData: List<BannerData>) {
-    item {
+    item(key = "banner") {
         //banner
         Banner(count = bannerData.size) { index ->
             Surface(
                 modifier = Modifier
                     .height(220.dp)
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 10.dp),
+                    .padding(horizontal = 16.dp),
                 shape = RoundedCornerShape(10.dp),
             ) {
                 Box(
@@ -219,7 +203,7 @@ fun LazyListScope.banner(bannerData: List<BannerData>) {
 }
 
 @Composable
-fun Articles(
+private fun HomeContent(
     paddingValues: PaddingValues,
     uiState: HomeState = HomeState(),
     refreshState: PullRefreshState,
@@ -232,12 +216,13 @@ fun Articles(
         modifier = Modifier
             .padding(paddingValues)
             .fillMaxSize(),
-        state = uiState.multiState,
+        state = if (refreshState.refreshing) MultiStateWidgetState.Loading else MultiStateWidgetState.Content,
     ) {
         Box(modifier = Modifier.pullRefresh(refreshState)) {
 
             LazyColumn(
                 state = lazyListState,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
                 contentPadding = PaddingValues(bottom = 20.dp),
             ) {
                 //banner
@@ -250,6 +235,11 @@ fun Articles(
                 ) { index ->
                     pageData[index]?.let { data ->
                         ArticleItem(data, collectArticle, goArticleDetailScreen)
+                    }
+                }
+                item {
+                    if (pageData.loadState.append is LoadState.Loading) {
+                        CircularProgressIndicator()
                     }
                 }
             }
@@ -273,6 +263,7 @@ fun ArticlesPreview() {
             content = {
                 LazyColumn(
                     modifier = Modifier.padding(it),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                     contentPadding = PaddingValues(vertical = 20.dp),
                 ) {
                     items(count = 5) {

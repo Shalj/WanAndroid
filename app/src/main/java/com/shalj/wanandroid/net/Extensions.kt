@@ -1,6 +1,7 @@
 package com.shalj.wanandroid.net
 
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.shalj.wanandroid.base.BaseResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
@@ -19,8 +20,10 @@ fun Any.createBody(): RequestBody {
     return toJson().toRequestBody(mediaTypeJson)
 }
 
-fun Any.toJson() = Gson().toJson(this)
-inline fun <reified T> String.toModel() = Gson().fromJson(this, T::class.java)
+fun Any.toJson(): String = Gson().toJson(this)
+inline fun <reified T> String.toModel(): T = Gson().fromJson(this, T::class.java)
+inline fun <reified T> String.toModelList(): List<T> =
+    Gson().fromJson(this, object : TypeToken<List<T>>() {}.type)
 
 //通用的异常处理
 inline fun <reified T> withRequestResult(io: () -> RequestResult<T>): RequestResult<T> =
@@ -36,10 +39,10 @@ fun <T> BaseResponse<T>.handleResponse(): RequestResult<T> {
     return when (errorCode) {
         0 -> RequestResult.Success(data)
         -1001 -> {
-            RequestResult.Error("登录信息已过期，请重新登录")
+            RequestResult.Error("登录信息已过期，请重新登录", Throwable("登录信息已过期，请重新登录"))
         }
 
-        else -> RequestResult.Error(errorMsg)
+        else -> RequestResult.Error(errorMsg, Throwable(errorMsg))
     }
 }
 

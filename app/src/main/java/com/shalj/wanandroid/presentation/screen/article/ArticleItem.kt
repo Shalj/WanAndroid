@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shalj.wanandroid.model.ArticleData
+import com.shalj.wanandroid.domain.ArticleData
 import com.shalj.wanandroid.presentation.components.AnimatedHeart
-import com.shalj.wanandroid.presentation.theme.WanAndroidTheme
+import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 
 @Preview(showBackground = true)
 @Composable
@@ -53,7 +53,6 @@ fun ArticleItem(
     Card(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .padding(bottom = 10.dp)
             .clip(RoundedCornerShape(10.dp))
             .clickable { onClick(articleData.link.orEmpty(), articleData.title.orEmpty()) },
         elevation = CardDefaults.cardElevation(

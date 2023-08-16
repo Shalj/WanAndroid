@@ -35,9 +35,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shalj.wanandroid.R
-import com.shalj.wanandroid.model.LoginResp
+import com.shalj.wanandroid.domain.LoginResp
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
-import com.shalj.wanandroid.presentation.theme.WanAndroidTheme
+import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -50,7 +50,7 @@ fun MeScreenPreview() {
 
 @Composable
 fun MeScreen(
-    viewModel: MeIntent = hiltViewModel(),
+    viewModel: MeVM = hiltViewModel(),
     login: () -> Unit = {},
     goMessage: () -> Unit = {},
     goCollect: () -> Unit = {},
@@ -90,7 +90,7 @@ fun MeScreen(
 }
 
 @Composable
-private fun MeInfo(viewModel: MeIntent, login: () -> Unit) {
+private fun MeInfo(viewModel: MeVM, login: () -> Unit) {
 
     val userInfo by viewModel.userInfo.collectAsStateWithLifecycle(initialValue = LoginResp())
 

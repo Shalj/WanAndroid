@@ -1,7 +1,6 @@
-package com.shalj.wanandroid.model
+package com.shalj.wanandroid.domain
 
 data class ArticleData(
-    val adminAdd: Boolean? = false,
     val apkLink: String? = "",
     val audit: Int? = 0,
     val author: String? = "",
@@ -30,7 +29,7 @@ data class ArticleData(
     val shareUser: String? = "",
     val superChapterId: Int? = 0,
     val superChapterName: String? = "",
-    val tags: List<Tag?>? = listOf(),
+    val tags: List<Tag>? = listOf(),
     val title: String? = "",
     val type: Int? = 0,
     val userId: Int? = 0,

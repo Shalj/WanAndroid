@@ -1,7 +1,7 @@
 package com.shalj.wanandroid.di
 
 import android.content.Context
-import com.shalj.wanandroid.model.LoginResp
+import com.shalj.wanandroid.domain.LoginResp
 import com.shalj.wanandroid.net.Api
 import com.shalj.wanandroid.net.ApiService
 import com.shalj.wanandroid.net.toModel
@@ -42,7 +42,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideApi(retrofit: Retrofit) = Api(retrofit.create(ApiService::class.java))
+    fun provideApiService(retrofit: Retrofit) = retrofit.create(ApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideApi(apiService: ApiService) = Api(apiService)
 
 }
 

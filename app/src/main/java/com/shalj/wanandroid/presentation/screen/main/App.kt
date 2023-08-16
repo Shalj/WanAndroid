@@ -26,7 +26,7 @@ import com.shalj.wanandroid.presentation.screen.login.LoginScreen
 import com.shalj.wanandroid.presentation.screen.main.me.MeScreen
 import com.shalj.wanandroid.presentation.screen.register.RegisterScreen
 import com.shalj.wanandroid.presentation.screen.start.StartScreen
-import com.shalj.wanandroid.presentation.theme.WanAndroidTheme
+import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 
 @Composable
 fun App() {

@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -46,7 +47,7 @@ import com.shalj.wanandroid.presentation.components.WanScaffold
 import com.shalj.wanandroid.presentation.components.WanSpacer
 import com.shalj.wanandroid.presentation.components.WanTextField
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
-import com.shalj.wanandroid.presentation.theme.WanAndroidTheme
+import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 import kotlinx.coroutines.launch
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -57,9 +58,10 @@ fun LoginScreenPreview() {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(
-    register: () -> Unit, onBackPressed: () -> Unit, viewModel: LoginIntent = hiltViewModel()
+    register: () -> Unit, onBackPressed: () -> Unit, viewModel: LoginVM = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle(LoginState())
     val keyboardController = LocalSoftwareKeyboardController.current
