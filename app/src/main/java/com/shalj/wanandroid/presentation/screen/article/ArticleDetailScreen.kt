@@ -2,8 +2,6 @@ package com.shalj.wanandroid.presentation.screen.article
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.webkit.WebView
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideIn
@@ -38,7 +36,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,7 +52,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
+import com.google.accompanist.web.WebViewNavigator
 import com.google.accompanist.web.rememberSaveableWebViewState
+import com.google.accompanist.web.rememberWebViewNavigator
+import com.google.accompanist.web.rememberWebViewState
 import com.shalj.wanandroid.presentation.components.AnimatedHeart
 import com.shalj.wanandroid.presentation.components.WanSpacer
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
@@ -86,16 +86,13 @@ fun ArticleDetailScreen(
         viewModel.onEvent(ArticleDetailEvent.Init(id))
     }
 
-
     val state by viewModel.state.collectAsStateWithLifecycle(initialValue = ArticleDetailState())
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val webviewState = rememberSaveableWebViewState()
+    val bottomSheetState = rememberModalBottomSheetState()
+    val webviewState = rememberWebViewState(state.article.link.orEmpty())
+    val webViewNavigator = rememberWebViewNavigator()
+
     var progress by remember {
         mutableFloatStateOf(0f)
-    }
-
-    var webview by remember {
-        mutableStateOf<WebView?>(null)
     }
 
     LaunchedEffect(key1 = webviewState.loadingState, block = {
@@ -110,15 +107,6 @@ fun ArticleDetailScreen(
         }
     }
 
-    LaunchedEffect(key1 = state.showMoreMenu) {
-        if (state.showMoreMenu) {
-            bottomSheetState.show()
-        } else {
-            bottomSheetState.hide()
-        }
-    }
-
-
     Scaffold(
         topBar = {
             WanTopAppBar(
@@ -128,7 +116,7 @@ fun ArticleDetailScreen(
                     AnimatedHeart(
                         modifier = Modifier.size(30.dp),
                         isUpdating = state.isUpdatingLikeState,
-                        selected = state.article.collect ?: false,
+                        provideSelected = { state.article.collect ?: false },
                         onToggle = { viewModel.onEvent(ArticleDetailEvent.CollectArticle(state.article)) }
                     )
                     IconButton(
@@ -152,9 +140,9 @@ fun ArticleDetailScreen(
             ) {
                 WebView(
                     modifier = Modifier.fillMaxSize(),
+                    navigator = webViewNavigator,
                     state = webviewState,
                     onCreated = {
-                        webview = it
                         it.settings.apply {
                             javaScriptEnabled = true
                             databaseEnabled = true
@@ -190,7 +178,7 @@ fun ArticleDetailScreen(
                 }
             }
 
-        BottomMenu(state, viewModel, bottomSheetState, webview)
+        BottomMenu(state, viewModel, bottomSheetState, webViewNavigator)
     }
 }
 
@@ -200,7 +188,7 @@ private fun BottomMenu(
     state: ArticleDetailState,
     viewModel: ArticleDetailVM,
     bottomSheetState: SheetState,
-    webView: WebView?,
+    webView: WebViewNavigator,
 ) {
     val context = LocalContext.current
     val urlHandler = LocalUriHandler.current
@@ -223,9 +211,7 @@ private fun BottomMenu(
                 }
                 WanSpacer(width = 10.dp)
                 BottomMenuItem(Icons.Rounded.Refresh, "刷新") {
-
-                    logE("webview", webView)
-                    webView?.reload()
+                    webView.reload()
                     viewModel.onEvent(ArticleDetailEvent.HideMoreMenu)
                 }
                 WanSpacer(width = 10.dp)

@@ -103,7 +103,7 @@ fun ArticleItem(
             AnimatedHeart(
                 modifier = Modifier.size(20.dp),
                 isUpdating = articleData.isUpdatingLikeState,
-                selected = articleData.collect ?: false,
+                provideSelected = { articleData.collect ?: false },
                 onToggle = { onCollectClick(articleData) },
             )
         }

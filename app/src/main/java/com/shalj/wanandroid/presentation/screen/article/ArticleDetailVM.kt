@@ -3,6 +3,8 @@ package com.shalj.wanandroid.presentation.screen.article
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
+import com.google.accompanist.web.WebContent
+import com.google.accompanist.web.WebViewState
 import com.shalj.wanandroid.base.BaseArticleViewModel
 import com.shalj.wanandroid.data.local.article.ArticleDatabase
 import com.shalj.wanandroid.data.local.article.ArticleEntity

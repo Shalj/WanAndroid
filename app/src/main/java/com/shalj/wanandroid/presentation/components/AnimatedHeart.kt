@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 fun AnimatedHeart(
     modifier: Modifier = Modifier,
     isUpdating: Boolean = false,
-    selected: Boolean = false,
+    provideSelected: ()->Boolean = { false },
     onToggle: (selected: Boolean) -> Unit = {}
 ) {
     var needScale by remember { mutableStateOf(false) }
@@ -43,6 +43,7 @@ fun AnimatedHeart(
                 color = MaterialTheme.colorScheme.primary
             )
         } else {
+            val selected = provideSelected()
             Icon(
                 modifier = modifier
                     .scale(scale)
