@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.cachedIn
 import androidx.room.withTransaction
-import com.shalj.wanandroid.base.BaseViewModel
+import com.shalj.wanandroid.base.BaseArticleViewModel
 import com.shalj.wanandroid.data.local.article.ArticleDatabase
 import com.shalj.wanandroid.data.local.article.ArticleEntity
 import com.shalj.wanandroid.data.local.article.toReadEntity
@@ -28,7 +28,7 @@ class HomeViewModel @Inject constructor(
     private val api: Api,
     pager: Pager<Int, ArticleEntity>,
     private val articleDb: ArticleDatabase,
-) : BaseViewModel() {
+) : BaseArticleViewModel(articleDb, api) {
 
     private val _multiState = MutableStateFlow<MultiStateWidgetState>(MultiStateWidgetState.Loading)
 
@@ -77,36 +77,6 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             }
-        }
-    }
-
-    private fun collectArticle(articleData: ArticleEntity) {
-        viewModelScope.launch {
-            updateArticles(articleData.apply { isUpdatingLikeState = true })
-            val result = if (articleData.collect == true) {
-                //取消收藏
-                api.unCollectArticle(articleData.id ?: -1)
-            } else {
-                api.collectArticle(articleData.id ?: -1)
-            }
-
-            when (result) {
-                is RequestResult.Error -> {
-                    toast.value = result.msg
-                    updateArticles(articleData.apply { isUpdatingLikeState = false })
-                }
-
-                is RequestResult.Success -> {
-                    articleData.collect = !(articleData.collect ?: false)
-                    updateArticles(articleData.apply { isUpdatingLikeState = false })
-                }
-            }
-        }
-    }
-
-    private fun updateArticles(articleData: ArticleEntity) {
-        viewModelScope.launch {
-            articleDb.dao.update(articleData)
         }
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,7 +41,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shalj.wanandroid.R
 import com.shalj.wanandroid.presentation.components.PasswordTextField
 import com.shalj.wanandroid.presentation.components.WanLoading
-import com.shalj.wanandroid.presentation.components.WanScaffold
 import com.shalj.wanandroid.presentation.components.WanSpacer
 import com.shalj.wanandroid.presentation.components.WanTextField
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
@@ -70,16 +70,8 @@ fun LoginScreen(
         }
     }
 
-    WanScaffold(
+    Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        snackbarAction = {
-            TextButton(onClick = onBackPressed) { Text(text = "关闭") }
-        },
-        loading = {
-            WanLoading(state.showLoading, "登录中…", onDismissRequest = {
-                viewModel.onEvent(LoginEvent.DismissLoading)
-            })
-        },
         topBar = {
             WanTopAppBar(navigationIcon = {
                 IconButton(modifier = Modifier.padding(start = 10.dp),
@@ -95,7 +87,9 @@ fun LoginScreen(
         },
         content = {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .padding(it)
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
@@ -179,5 +173,8 @@ fun LoginScreen(
                     }
                 )
             }
+            WanLoading(state.showLoading, "登录中…", onDismissRequest = {
+                viewModel.onEvent(LoginEvent.DismissLoading)
+            })
         })
 }

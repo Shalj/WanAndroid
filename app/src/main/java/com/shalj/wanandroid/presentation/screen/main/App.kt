@@ -88,27 +88,21 @@ fun App() {
                     navigateToMe = { navController.navigate(Route.meScreen) },
                     navigateToArticleDetailScreen = { article ->
                         navController.navigate(
-                            Route.articleDetail.replace("{link}", article.link.orEmpty())
-                                .replace("{title}", article.title.orEmpty())
+                            Route.articleDetail.replace("{id}", article.id.toString())
                         )
                     }
                 )
             }
             composable(
                 Route.articleDetail, arguments = listOf(
-                    navArgument("link") {
-                        type = NavType.StringType
-                        defaultValue = ""
-                    },
-                    navArgument("title") {
-                        type = NavType.StringType
-                        defaultValue = ""
+                    navArgument("id") {
+                        type = NavType.IntType
+                        defaultValue = -1
                     },
                 )
             ) {
-                val link = it.arguments?.getString("link") ?: ""
-                val title = it.arguments?.getString("title") ?: ""
-                ArticleDetailScreen(link, title) {
+                val id = it.arguments?.getInt("id") ?: -1
+                ArticleDetailScreen(id) {
                     navController.navigateUp()
                 }
             }

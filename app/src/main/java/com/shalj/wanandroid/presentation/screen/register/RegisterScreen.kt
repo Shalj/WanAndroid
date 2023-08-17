@@ -15,6 +15,7 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,7 +43,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.shalj.wanandroid.R
 import com.shalj.wanandroid.presentation.components.PasswordTextField
 import com.shalj.wanandroid.presentation.components.WanLoading
-import com.shalj.wanandroid.presentation.components.WanScaffold
 import com.shalj.wanandroid.presentation.components.WanSpacer
 import com.shalj.wanandroid.presentation.components.WanTextField
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
@@ -75,20 +75,16 @@ fun RegisterScreen(
         }
     }
 
-    WanScaffold(
+    Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             WanTopAppBar(onBackPressed = onBackPressed)
         },
-        loading = {
-            WanLoading(state.showLoading, "注册中…", onDismissRequest = {
-                viewModel.onEvent(RegisterEvent.DismissLoading)
-            })
-        },
-        snackbarHostState = snackbarHostState,
         content = {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .padding(it)
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
@@ -216,6 +212,10 @@ fun RegisterScreen(
                     append("」获取验证码")
                 })
             }
+
+            WanLoading(state.showLoading, "注册中…", onDismissRequest = {
+                viewModel.onEvent(RegisterEvent.DismissLoading)
+            })
         }
     )
 }

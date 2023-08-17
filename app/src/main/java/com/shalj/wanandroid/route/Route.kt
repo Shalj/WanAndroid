@@ -3,7 +3,7 @@ package com.shalj.wanandroid.route
 object Route {
     const val startScreen = "/startScreen"
     const val mainScreen = "/mainScreen"
-    const val articleDetail = "/articleDetail?link={link}&title={title}"
+    const val articleDetail = "/articleDetail?id={id}"
 
     const val meScreen = "/meScreen"
 

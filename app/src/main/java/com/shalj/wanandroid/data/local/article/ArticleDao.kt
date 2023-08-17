@@ -20,4 +20,7 @@ interface ArticleDao {
 
     @Update
     suspend fun update(article: ArticleEntity)
+
+    @Query("SELECT * FROM articleentity WHERE id=:id")
+    suspend fun queryArticleById(id: Int?): ArticleEntity
 }
