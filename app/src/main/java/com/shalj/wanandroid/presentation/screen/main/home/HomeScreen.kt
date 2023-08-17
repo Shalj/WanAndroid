@@ -54,7 +54,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.shalj.wanandroid.R
-import com.shalj.wanandroid.domain.ArticleData
+import com.shalj.wanandroid.data.local.ArticleEntity
 import com.shalj.wanandroid.domain.BannerData
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
 import com.shalj.wanandroid.presentation.components.banner.Banner
@@ -67,10 +67,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    goSearch: () -> Unit = {},
-    goMe: () -> Unit = {},
+    navigateToSearch: () -> Unit = {},
+    navigateToMe: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
-    goArticleDetailScreen: (link: String, title: String) -> Unit
+    navigateToArticleDetailScreen: (link: String, title: String) -> Unit
 ) {
     SetupLifeCycle(lifecycleOwner = LocalLifecycleOwner.current, viewModel)
 
@@ -88,15 +88,18 @@ fun HomeScreen(
     Scaffold(
         contentColor = MaterialTheme.colorScheme.background,
         floatingActionButton = { BackToTopBtn(lazyListState) },
-        topBar = { MyTopBar(goSearch, goMe) },
+        topBar = { MyTopBar(navigateToSearch, navigateToMe) },
         content = {
             HomeContent(
                 it,
                 uiState,
                 refreshState,
-                articles,
+                { articles },
                 lazyListState,
-                goArticleDetailScreen,
+                navigateToArticleDetailScreen = { article ->
+                    viewModel.onEvent(HomeEvent.ReadArticle(article))
+                    navigateToArticleDetailScreen(article.link.orEmpty(), article.title.orEmpty())
+                },
                 collectArticle = { articleData ->
                     viewModel.onEvent(HomeEvent.CollectArticle(articleData))
                 }
@@ -107,8 +110,8 @@ fun HomeScreen(
 
 @Composable
 fun MyTopBar(
-    goSearch: () -> Unit,
-    goMe: () -> Unit,
+    navigateToSearch: () -> Unit,
+    navigateToMe: () -> Unit,
 ) {
     WanTopAppBar(
         navigationIcon = {
@@ -117,11 +120,11 @@ fun MyTopBar(
                 contentScale = ContentScale.FillWidth,
                 painter = painterResource(id = R.drawable.logo_horizontal),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                contentDescription = "logo"
+                contentDescription = "lonavigateTo"
             )
         },
         actions = {
-            IconButton(onClick = goSearch) {
+            IconButton(onClick = navigateToSearch) {
                 Icon(
                     modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
                     imageVector = Icons.Outlined.Search,
@@ -129,7 +132,7 @@ fun MyTopBar(
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
-            IconButton(onClick = goMe) {
+            IconButton(onClick = navigateToMe) {
                 Image(
                     modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
                     painter = painterResource(id = R.drawable.ic_avatar),
@@ -207,10 +210,10 @@ private fun HomeContent(
     paddingValues: PaddingValues,
     uiState: HomeState = HomeState(),
     refreshState: PullRefreshState,
-    pageData: LazyPagingItems<ArticleData>,
+    providerPageData: () -> LazyPagingItems<ArticleEntity>,
     lazyListState: LazyListState,
-    goArticleDetailScreen: (link: String, title: String) -> Unit,
-    collectArticle: (articleData: ArticleData) -> Unit,
+    navigateToArticleDetailScreen: (articleData: ArticleEntity) -> Unit,
+    collectArticle: (articleData: ArticleEntity) -> Unit,
 ) {
     MultiStateWidget(
         modifier = Modifier
@@ -219,7 +222,7 @@ private fun HomeContent(
         state = if (refreshState.refreshing) MultiStateWidgetState.Loading else MultiStateWidgetState.Content,
     ) {
         Box(modifier = Modifier.pullRefresh(refreshState)) {
-
+            val pageData = providerPageData()
             LazyColumn(
                 state = lazyListState,
                 verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -231,10 +234,10 @@ private fun HomeContent(
                 //articles
                 items(
                     count = pageData.itemCount,
-                    key = { index -> pageData[index]?.id ?: 0 },
+                    key = { index -> index },
                 ) { index ->
                     pageData[index]?.let { data ->
-                        ArticleItem(data, collectArticle, goArticleDetailScreen)
+                        ArticleItem(data, collectArticle, navigateToArticleDetailScreen)
                     }
                 }
                 item {
@@ -267,7 +270,7 @@ fun ArticlesPreview() {
                     contentPadding = PaddingValues(vertical = 20.dp),
                 ) {
                     items(count = 5) {
-                        ArticleItem { _, _ -> }
+                        ArticleItem { }
                     }
                 }
             }

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shalj.wanandroid.domain.ArticleData
+import com.shalj.wanandroid.data.local.ArticleEntity
 import com.shalj.wanandroid.presentation.components.AnimatedHeart
 import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 
@@ -33,28 +33,28 @@ import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 fun Preview() {
     WanAndroidTheme {
         ArticleItem(
-            articleData = ArticleData(
+            articleData = ArticleEntity(
                 title = "Title of the article...",
                 author = "作者",
                 niceDate = "1天前",
                 chapterName = "chapterName",
                 superChapterName = "superChapterName",
             )
-        ) { _, _ -> }
+        ) { }
     }
 }
 
 @Composable
 fun ArticleItem(
-    articleData: ArticleData = ArticleData(),
-    onCollectClick: (articleData: ArticleData) -> Unit = {},
-    onClick: (link: String, title: String) -> Unit
+    articleData: ArticleEntity = ArticleEntity(),
+    onCollectClick: (articleData: ArticleEntity) -> Unit = {},
+    onClick: (articleData: ArticleEntity) -> Unit
 ) {
     Card(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(10.dp))
-            .clickable { onClick(articleData.link.orEmpty(), articleData.title.orEmpty()) },
+            .clickable { onClick(articleData) },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 10.dp,
             pressedElevation = 10.dp
@@ -83,7 +83,7 @@ fun ArticleItem(
             overflow = TextOverflow.Ellipsis,
             style = TextStyle(
                 lineHeight = TextUnit(20f, TextUnitType.Sp),
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (articleData.read) 0.5f else 1f),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp,
             )
@@ -102,6 +102,7 @@ fun ArticleItem(
             Spacer(modifier = Modifier.weight(1f))
             AnimatedHeart(
                 modifier = Modifier.size(20.dp),
+                isUpdating = articleData.isUpdatingLikeState,
                 selected = articleData.collect ?: false,
                 onToggle = { onCollectClick(articleData) },
             )

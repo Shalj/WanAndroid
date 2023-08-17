@@ -23,7 +23,9 @@ object ArticleModule {
     @Provides
     @Singleton
     fun provideArticleDatabase(@ApplicationContext context: Context): ArticleDatabase =
-        Room.databaseBuilder(context, ArticleDatabase::class.java, "article.db").build()
+        Room.databaseBuilder(context, ArticleDatabase::class.java, "article.db")
+            .fallbackToDestructiveMigration()
+            .build()
 
     @OptIn(ExperimentalPagingApi::class)
     @Provides

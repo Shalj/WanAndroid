@@ -3,13 +3,11 @@ package com.shalj.wanandroid.presentation.screen.main.home
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.cachedIn
-import androidx.paging.map
+import androidx.room.withTransaction
 import com.shalj.wanandroid.base.BaseViewModel
 import com.shalj.wanandroid.data.local.ArticleDatabase
 import com.shalj.wanandroid.data.local.ArticleEntity
-import com.shalj.wanandroid.data.mappers.toArticleData
-import com.shalj.wanandroid.data.mappers.toArticleEntity
-import com.shalj.wanandroid.domain.ArticleData
+import com.shalj.wanandroid.data.local.toReadEntity
 import com.shalj.wanandroid.domain.BannerData
 import com.shalj.wanandroid.net.Api
 import com.shalj.wanandroid.net.RequestResult
@@ -20,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,11 +34,7 @@ class HomeViewModel @Inject constructor(
 
     private val _banner = MutableStateFlow(listOf<BannerData>())
 
-    val articles = pager.flow.map { pagingData ->
-        pagingData.map { article ->
-            article.toArticleData()
-        }
-    }.cachedIn(viewModelScope)
+    val articles = pager.flow.cachedIn(viewModelScope)
 
     val uiState = combine(
         _multiState, _banner,
@@ -68,11 +61,20 @@ class HomeViewModel @Inject constructor(
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.CollectArticle -> collectArticle(event.articleData)
+            is HomeEvent.ReadArticle -> {
+                viewModelScope.launch {
+                    articleDb.withTransaction {
+                        articleDb.readDao.insert(event.articleData.toReadEntity())
+                        articleDb.dao.update(event.articleData.apply { read = true })
+                    }
+                }
+            }
         }
     }
 
-    private fun collectArticle(articleData: ArticleData) {
+    private fun collectArticle(articleData: ArticleEntity) {
         viewModelScope.launch {
+            updateArticles(articleData.apply { isUpdatingLikeState = true })
             val result = if (articleData.collect == true) {
                 //取消收藏
                 api.unCollectArticle(articleData.id ?: -1)
@@ -81,18 +83,22 @@ class HomeViewModel @Inject constructor(
             }
 
             when (result) {
-                is RequestResult.Error -> toast.value = result.msg
+                is RequestResult.Error -> {
+                    toast.value = result.msg
+                    updateArticles(articleData.apply { isUpdatingLikeState = false })
+                }
+
                 is RequestResult.Success -> {
                     articleData.collect = !(articleData.collect ?: false)
-                    updateArticles(articleData)
+                    updateArticles(articleData.apply { isUpdatingLikeState = false })
                 }
             }
         }
     }
 
-    private fun updateArticles(articleData: ArticleData) {
+    private fun updateArticles(articleData: ArticleEntity) {
         viewModelScope.launch {
-            articleDb.dao.update(articleData.toArticleEntity())
+            articleDb.dao.update(articleData)
         }
     }
 }

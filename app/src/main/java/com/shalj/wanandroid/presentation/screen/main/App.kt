@@ -6,7 +6,8 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.material3.Text
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -17,15 +18,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.shalj.wanandroid.route.LoginRoute
-import com.shalj.wanandroid.route.Route
-import com.shalj.wanandroid.route.horizontalValues
-import com.shalj.wanandroid.route.verticalValues
 import com.shalj.wanandroid.presentation.screen.article.ArticleDetailScreen
 import com.shalj.wanandroid.presentation.screen.login.LoginScreen
 import com.shalj.wanandroid.presentation.screen.main.me.MeScreen
 import com.shalj.wanandroid.presentation.screen.register.RegisterScreen
 import com.shalj.wanandroid.presentation.screen.start.StartScreen
+import com.shalj.wanandroid.route.LoginRoute
+import com.shalj.wanandroid.route.Route
+import com.shalj.wanandroid.route.horizontalValues
+import com.shalj.wanandroid.route.verticalValues
 import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 
 @Composable
@@ -39,6 +40,8 @@ fun App() {
             startDestination = Route.startScreen,
             enterTransition = {
                 when (targetState.destination.route) {
+                    Route.mainScreen -> scaleIn(initialScale = .5f) + fadeIn()
+
                     in verticalValues -> slideIntoContainer(
                         AnimatedContentTransitionScope.SlideDirection.Up,
                         animationSpec = tween(duration)
@@ -56,6 +59,7 @@ fun App() {
             popEnterTransition = { fadeIn(animationSpec = tween(duration)) },
             popExitTransition = {
                 when (initialState.destination.route) {
+                    Route.startScreen -> fadeOut() + scaleOut(targetScale = .5f)
                     in verticalValues -> slideOutOfContainer(
                         AnimatedContentTransitionScope.SlideDirection.Down,
                         animationSpec = tween(duration)
@@ -72,6 +76,7 @@ fun App() {
         ) {
             composable(Route.startScreen) {
                 StartScreen {
+                    navController.popBackStack()
                     val options = NavOptions.Builder().setLaunchSingleTop(true).build()
                     navController.navigate(Route.mainScreen, options)
                 }
@@ -79,9 +84,9 @@ fun App() {
             loginGraph(navController)
             composable(Route.mainScreen) {
                 MainScreen(
-                    goSearch = {},
-                    goMe = { navController.navigate(Route.meScreen) },
-                    goArticleDetailScreen = { link, title ->
+                    navigateToSearch = {},
+                    navigateToMe = { navController.navigate(Route.meScreen) },
+                    navigateToArticleDetailScreen = { link, title ->
                         navController.navigate(
                             Route.articleDetail.replace("{link}", link)
                                 .replace("{title}", title)
@@ -112,11 +117,11 @@ fun App() {
                     login = {
                         navController.navigate(LoginRoute.login)
                     },
-                    goMessage = {},
-                    goCollect = {},
-                    goShare = {},
-                    goSetting = {},
-                    goTools = {},
+                    navigateToMessage = {},
+                    navigateToCollect = {},
+                    navigateToShare = {},
+                    navigateToSetting = {},
+                    navigateToTools = {},
                     onBackPressed = navController::navigateUp
                 )
             }

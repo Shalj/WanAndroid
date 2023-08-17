@@ -17,14 +17,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -47,8 +44,8 @@ import com.shalj.wanandroid.presentation.components.WanScaffold
 import com.shalj.wanandroid.presentation.components.WanSpacer
 import com.shalj.wanandroid.presentation.components.WanTextField
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
+import com.shalj.wanandroid.toast
 import com.shalj.wanandroid.ui.theme.WanAndroidTheme
-import kotlinx.coroutines.launch
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -65,16 +62,10 @@ fun LoginScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle(LoginState())
     val keyboardController = LocalSoftwareKeyboardController.current
-    val snackbarHostState = remember {
-        SnackbarHostState()
-    }
-    val scope = rememberCoroutineScope()
 
-    if (state.loginSuccess) {
-        SideEffect {
-            scope.launch {
-                snackbarHostState.showSnackbar("登录成功")
-            }
+    LaunchedEffect(key1 = state.loginSuccess) {
+        if (state.loginSuccess) {
+            toast.value = "登录成功"
             onBackPressed()
         }
     }
@@ -84,7 +75,6 @@ fun LoginScreen(
         snackbarAction = {
             TextButton(onClick = onBackPressed) { Text(text = "关闭") }
         },
-        snackbarHostState = snackbarHostState,
         loading = {
             WanLoading(state.showLoading, "登录中…", onDismissRequest = {
                 viewModel.onEvent(LoginEvent.DismissLoading)

@@ -2,7 +2,7 @@ package com.shalj.wanandroid.net
 
 import com.shalj.wanandroid.base.BaseResponse
 import com.shalj.wanandroid.base.PageResponse
-import com.shalj.wanandroid.domain.ArticleData
+import com.shalj.wanandroid.data.local.ArticleEntity
 import com.shalj.wanandroid.domain.BannerData
 import com.shalj.wanandroid.domain.LoginResp
 import okhttp3.RequestBody
@@ -18,7 +18,7 @@ interface ApiService {
     suspend fun getHomeArticleList(
         @Path("page") page: Int,
         @Query("page_size") pageSize: Int = 20
-    ): BaseResponse<PageResponse<ArticleData>>
+    ): BaseResponse<PageResponse<ArticleEntity>>
 
     @POST("/lg/collect/{id}/json")
     suspend fun collectArticle(@Path("id") id: Int): BaseResponse<Any>

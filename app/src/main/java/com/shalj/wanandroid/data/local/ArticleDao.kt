@@ -2,14 +2,18 @@ package com.shalj.wanandroid.data.local
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
+import androidx.room.DeleteColumn
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RenameColumn
 import androidx.room.Update
-import androidx.room.Upsert
+import androidx.room.migration.AutoMigrationSpec
 
 @Dao
 interface ArticleDao {
-    @Upsert
-    suspend fun upsertAll(articles: List<ArticleEntity>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(articles: List<ArticleEntity>)
 
     @Query("SELECT * FROM articleentity ORDER BY publishTime DESC")
     fun pagingSource(): PagingSource<Int, ArticleEntity>

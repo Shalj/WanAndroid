@@ -100,7 +100,7 @@ fun StartScreen(
             enter = expandVertically(expandFrom = Alignment.Bottom) + fadeIn(initialAlpha = 0.1f),
         ) {
             Text(
-                text = "坚持下去，你就是下一个大牛！",
+                text = "坚持下去，下一个大牛就是你",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.secondary

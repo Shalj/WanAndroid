@@ -52,11 +52,11 @@ fun MeScreenPreview() {
 fun MeScreen(
     viewModel: MeVM = hiltViewModel(),
     login: () -> Unit = {},
-    goMessage: () -> Unit = {},
-    goCollect: () -> Unit = {},
-    goShare: () -> Unit = {},
-    goSetting: () -> Unit = {},
-    goTools: () -> Unit = {},
+    navigateToMessage: () -> Unit = {},
+    navigateToCollect: () -> Unit = {},
+    navigateToShare: () -> Unit = {},
+    navigateToSetting: () -> Unit = {},
+    navigateToTools: () -> Unit = {},
     onBackPressed: () -> Unit,
 ) {
     Scaffold(
@@ -127,10 +127,10 @@ private fun MeInfo(viewModel: MeVM, login: () -> Unit) {
 @Composable
 private fun ColumnScope.SettingContent(
     login: () -> Unit = {},
-    goMessage: () -> Unit = {},
-    goCollect: () -> Unit = {},
-    goShare: () -> Unit = {},
-    goTools: () -> Unit = {},
+    navigateToMessage: () -> Unit = {},
+    navigateToCollect: () -> Unit = {},
+    navigateToShare: () -> Unit = {},
+    navigateToTools: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -147,19 +147,19 @@ private fun ColumnScope.SettingContent(
         MeSettingItem(
             icon = R.drawable.round_message_24,
             title = "消息中心",
-            onClick = if (isLogin) goMessage else login
+            onClick = if (isLogin) navigateToMessage else login
         )
         MeSettingItem(
             icon = R.drawable.round_share_24,
             title = "我的分享",
-            onClick = if (isLogin) goShare else login
+            onClick = if (isLogin) navigateToShare else login
         )
         MeSettingItem(
             icon = R.drawable.round_favorite_24,
             title = "我的收藏",
-            onClick = if (isLogin) goCollect else login
+            onClick = if (isLogin) navigateToCollect else login
         )
-        MeSettingItem(icon = R.drawable.round_build_24, title = "常用工具", onClick = goTools)
+        MeSettingItem(icon = R.drawable.round_build_24, title = "常用工具", onClick = navigateToTools)
     }
 }
 
