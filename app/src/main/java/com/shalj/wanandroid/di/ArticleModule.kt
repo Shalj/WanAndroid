@@ -5,8 +5,8 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.room.Room
-import com.shalj.wanandroid.data.local.ArticleDatabase
-import com.shalj.wanandroid.data.local.ArticleEntity
+import com.shalj.wanandroid.data.local.article.ArticleDatabase
+import com.shalj.wanandroid.data.local.article.ArticleEntity
 import com.shalj.wanandroid.data.remote.ArticleRemoteMediator
 import com.shalj.wanandroid.net.Api
 import dagger.Module

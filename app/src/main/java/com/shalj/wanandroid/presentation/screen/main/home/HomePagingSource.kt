@@ -2,7 +2,7 @@ package com.shalj.wanandroid.presentation.screen.main.home
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.shalj.wanandroid.data.local.ArticleEntity
+import com.shalj.wanandroid.data.local.article.ArticleEntity
 import com.shalj.wanandroid.net.Api
 import com.shalj.wanandroid.net.RequestResult
 import com.shalj.wanandroid.presentation.components.multistatewidget.MultiStateWidgetState

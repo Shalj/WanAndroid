@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,7 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pullrefresh.PullRefreshIndicator
-import androidx.compose.material3.pullrefresh.PullRefreshState
 import androidx.compose.material3.pullrefresh.pullRefresh
 import androidx.compose.material3.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
@@ -54,7 +53,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.shalj.wanandroid.R
-import com.shalj.wanandroid.data.local.ArticleEntity
+import com.shalj.wanandroid.data.local.article.ArticleEntity
 import com.shalj.wanandroid.domain.BannerData
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
 import com.shalj.wanandroid.presentation.components.banner.Banner
@@ -65,12 +64,45 @@ import com.shalj.wanandroid.presentation.screen.start.SetupLifeCycle
 import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 import kotlinx.coroutines.launch
 
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    WanAndroidTheme {
+        Scaffold(
+            floatingActionButton = { BackToTopBtn() },
+            topBar = { MyTopBar({}, {}) },
+            content = {
+                LazyColumn(
+                    modifier = Modifier.padding(it),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(vertical = 20.dp),
+                ) {
+                    item(key = "banner") {
+                        Banner(bannerData = listOf())
+                    }
+                    items(count = 5) {
+                        ArticleItem(
+                            ArticleEntity(
+                                title = "Title of the article...",
+                                author = "作者",
+                                niceDate = "1天前",
+                                chapterName = "chapterName",
+                                superChapterName = "superChapterName",
+                            )
+                        )
+                    }
+                }
+            }
+        )
+    }
+}
+
 @Composable
 fun HomeScreen(
     navigateToSearch: () -> Unit = {},
     navigateToMe: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
-    navigateToArticleDetailScreen: (link: String, title: String) -> Unit
+    navigateToArticleDetailScreen: (ArticleEntity) -> Unit
 ) {
     SetupLifeCycle(lifecycleOwner = LocalLifecycleOwner.current, viewModel)
 
@@ -90,20 +122,58 @@ fun HomeScreen(
         floatingActionButton = { BackToTopBtn(lazyListState) },
         topBar = { MyTopBar(navigateToSearch, navigateToMe) },
         content = {
-            HomeContent(
-                it,
-                uiState,
-                refreshState,
-                { articles },
-                lazyListState,
-                navigateToArticleDetailScreen = { article ->
-                    viewModel.onEvent(HomeEvent.ReadArticle(article))
-                    navigateToArticleDetailScreen(article.link.orEmpty(), article.title.orEmpty())
+            MultiStateWidget(
+                modifier = Modifier
+                    .padding(it)
+                    .fillMaxSize(),
+                providerState = {
+                    if (refreshState.refreshing || it != MultiStateWidgetState.Content) MultiStateWidgetState.Loading else MultiStateWidgetState.Content
                 },
-                collectArticle = { articleData ->
-                    viewModel.onEvent(HomeEvent.CollectArticle(articleData))
+            ) {
+                Box(modifier = Modifier.pullRefresh(refreshState)) {
+                    val providerPageData = fun(): LazyPagingItems<ArticleEntity> { return articles }
+                    val pageData = providerPageData()
+                    LazyColumn(
+                        state = lazyListState,
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(bottom = 20.dp),
+                    ) {
+                        //banner
+                        item(key = "banner") {
+                            Banner(bannerData = uiState.banner)
+                        }
+
+                        //articles
+                        items(
+                            count = pageData.itemCount,
+                            key = { index -> index },
+                        ) { index ->
+                            pageData[index]?.let { data ->
+                                ArticleItem(data,
+                                    onCollectClick = { article ->
+                                        viewModel.onEvent(HomeEvent.CollectArticle(article))
+                                    },
+                                    onClick = { article ->
+                                        viewModel.onEvent(HomeEvent.CollectArticle(article))
+                                        navigateToArticleDetailScreen(article)
+                                    }
+                                )
+                            }
+                        }
+                        item {
+                            if (pageData.loadState.append is LoadState.Loading) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+
+                    PullRefreshIndicator(
+                        refreshing = refreshState.refreshing,
+                        state = refreshState,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
                 }
-            )
+            }
         }
     )
 }
@@ -180,100 +250,27 @@ fun BackToTopBtn(lazyListState: LazyListState = rememberLazyListState()) {
     }
 }
 
-fun LazyListScope.banner(bannerData: List<BannerData>) {
-    item(key = "banner") {
-        //banner
-        Banner(count = bannerData.size) { index ->
-            Surface(
-                modifier = Modifier
-                    .height(220.dp)
-                    .padding(horizontal = 16.dp),
-                shape = RoundedCornerShape(10.dp),
+@Composable
+fun LazyItemScope.Banner(bannerData: List<BannerData>) {
+    //banner
+    Banner(count = bannerData.size) { index ->
+        Surface(
+            modifier = Modifier
+                .height(220.dp)
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    AsyncImage(
-                        modifier = Modifier.fillMaxSize(),
-                        model = bannerData[index].imagePath ?: "",
-                        contentDescription = "banner-$index",
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    model = bannerData[index].imagePath ?: "",
+                    contentDescription = "banner-$index",
+                    contentScale = ContentScale.Crop
+                )
             }
         }
     }
-}
 
-@Composable
-private fun HomeContent(
-    paddingValues: PaddingValues,
-    uiState: HomeState = HomeState(),
-    refreshState: PullRefreshState,
-    providerPageData: () -> LazyPagingItems<ArticleEntity>,
-    lazyListState: LazyListState,
-    navigateToArticleDetailScreen: (articleData: ArticleEntity) -> Unit,
-    collectArticle: (articleData: ArticleEntity) -> Unit,
-) {
-    MultiStateWidget(
-        modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxSize(),
-        state = if (refreshState.refreshing) MultiStateWidgetState.Loading else MultiStateWidgetState.Content,
-    ) {
-        Box(modifier = Modifier.pullRefresh(refreshState)) {
-            val pageData = providerPageData()
-            LazyColumn(
-                state = lazyListState,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(bottom = 20.dp),
-            ) {
-                //banner
-                banner(bannerData = uiState.banner)
-
-                //articles
-                items(
-                    count = pageData.itemCount,
-                    key = { index -> index },
-                ) { index ->
-                    pageData[index]?.let { data ->
-                        ArticleItem(data, collectArticle, navigateToArticleDetailScreen)
-                    }
-                }
-                item {
-                    if (pageData.loadState.append is LoadState.Loading) {
-                        CircularProgressIndicator()
-                    }
-                }
-            }
-
-            PullRefreshIndicator(
-                refreshing = refreshState.refreshing,
-                state = refreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ArticlesPreview() {
-    WanAndroidTheme {
-        Scaffold(
-            floatingActionButton = { BackToTopBtn() },
-            topBar = { MyTopBar({}, {}) },
-            content = {
-                LazyColumn(
-                    modifier = Modifier.padding(it),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    contentPadding = PaddingValues(vertical = 20.dp),
-                ) {
-                    items(count = 5) {
-                        ArticleItem { }
-                    }
-                }
-            }
-        )
-    }
 }

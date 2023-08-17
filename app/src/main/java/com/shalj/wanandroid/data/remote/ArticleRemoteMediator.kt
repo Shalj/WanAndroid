@@ -5,8 +5,8 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.shalj.wanandroid.data.local.ArticleDatabase
-import com.shalj.wanandroid.data.local.ArticleEntity
+import com.shalj.wanandroid.data.local.article.ArticleDatabase
+import com.shalj.wanandroid.data.local.article.ArticleEntity
 import com.shalj.wanandroid.data.local.RemoteKey
 import com.shalj.wanandroid.ext.currentKey
 import com.shalj.wanandroid.ext.nextKey

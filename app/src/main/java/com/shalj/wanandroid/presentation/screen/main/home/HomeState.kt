@@ -1,6 +1,6 @@
 package com.shalj.wanandroid.presentation.screen.main.home
 
-import com.shalj.wanandroid.data.local.ArticleEntity
+import com.shalj.wanandroid.data.local.article.ArticleEntity
 import com.shalj.wanandroid.domain.BannerData
 import com.shalj.wanandroid.presentation.components.multistatewidget.MultiStateWidgetState
 

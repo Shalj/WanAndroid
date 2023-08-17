@@ -5,9 +5,9 @@ import androidx.paging.Pager
 import androidx.paging.cachedIn
 import androidx.room.withTransaction
 import com.shalj.wanandroid.base.BaseViewModel
-import com.shalj.wanandroid.data.local.ArticleDatabase
-import com.shalj.wanandroid.data.local.ArticleEntity
-import com.shalj.wanandroid.data.local.toReadEntity
+import com.shalj.wanandroid.data.local.article.ArticleDatabase
+import com.shalj.wanandroid.data.local.article.ArticleEntity
+import com.shalj.wanandroid.data.local.article.toReadEntity
 import com.shalj.wanandroid.domain.BannerData
 import com.shalj.wanandroid.net.Api
 import com.shalj.wanandroid.net.RequestResult

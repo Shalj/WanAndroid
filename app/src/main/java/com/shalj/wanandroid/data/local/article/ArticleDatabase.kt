@@ -1,10 +1,9 @@
-package com.shalj.wanandroid.data.local
+package com.shalj.wanandroid.data.local.article
 
-import androidx.room.AutoMigration
 import androidx.room.Database
-import androidx.room.DeleteColumn
 import androidx.room.RoomDatabase
-import androidx.room.migration.AutoMigrationSpec
+import com.shalj.wanandroid.data.local.RemoteKey
+import com.shalj.wanandroid.data.local.RemoteKeyDao
 
 @Database(
     version = 1,

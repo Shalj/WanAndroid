@@ -1,14 +1,11 @@
-package com.shalj.wanandroid.data.local
+package com.shalj.wanandroid.data.local.article
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
-import androidx.room.DeleteColumn
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.RenameColumn
 import androidx.room.Update
-import androidx.room.migration.AutoMigrationSpec
 
 @Dao
 interface ArticleDao {

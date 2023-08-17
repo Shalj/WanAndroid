@@ -1,4 +1,4 @@
-package com.shalj.wanandroid.data.local
+package com.shalj.wanandroid.data.local.article
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -1,4 +1,4 @@
-package com.shalj.wanandroid.data.local
+package com.shalj.wanandroid.data.local.article
 
 import androidx.room.Dao
 import androidx.room.Insert

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shalj.wanandroid.data.local.ArticleEntity
+import com.shalj.wanandroid.data.local.article.ArticleEntity
 import com.shalj.wanandroid.presentation.components.AnimatedHeart
 import com.shalj.wanandroid.ui.theme.WanAndroidTheme
 
@@ -48,7 +48,7 @@ fun Preview() {
 fun ArticleItem(
     articleData: ArticleEntity = ArticleEntity(),
     onCollectClick: (articleData: ArticleEntity) -> Unit = {},
-    onClick: (articleData: ArticleEntity) -> Unit
+    onClick: (articleData: ArticleEntity) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
