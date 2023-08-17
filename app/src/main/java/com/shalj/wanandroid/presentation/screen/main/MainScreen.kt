@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
+    login:()->Unit = {},
     navigateToSearch: () -> Unit = {},
     navigateToMe: () -> Unit = {},
     mainViewModel: MainViewModel = hiltViewModel(),
@@ -67,6 +68,7 @@ fun MainScreen(
             ) { index ->
                 when (index) {
                     0 -> HomeScreen(
+                        login = login,
                         navigateToSearch = navigateToSearch,
                         navigateToMe = navigateToMe,
                         navigateToArticleDetailScreen = navigateToArticleDetailScreen

@@ -1,5 +1,7 @@
 package com.shalj.wanandroid.presentation.screen.main.home
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.cachedIn
@@ -28,18 +30,20 @@ class HomeViewModel @Inject constructor(
     private val api: Api,
     pager: Pager<Int, ArticleEntity>,
     private val articleDb: ArticleDatabase,
-) : BaseArticleViewModel(articleDb, api) {
+    dataStore: DataStore<Preferences>
+) : BaseArticleViewModel(articleDb, api, dataStore) {
 
     private val _multiState = MutableStateFlow<MultiStateWidgetState>(MultiStateWidgetState.Loading)
 
     private val _banner = MutableStateFlow(listOf<BannerData>())
 
+
     val articles = pager.flow.cachedIn(viewModelScope)
 
     val uiState = combine(
-        _multiState, _banner,
-    ) { refreshing, banner ->
-        HomeState(refreshing, banner)
+        _multiState, _banner, needLogin
+    ) { refreshing, banner, needLogin ->
+        HomeState(refreshing, banner, needLogin)
     }.shareIn(viewModelScope, started = SharingStarted.WhileSubscribed())
 
     init {

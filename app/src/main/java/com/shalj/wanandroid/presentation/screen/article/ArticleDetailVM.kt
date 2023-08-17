@@ -1,5 +1,7 @@
 package com.shalj.wanandroid.presentation.screen.article
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.shalj.wanandroid.base.BaseArticleViewModel
 import com.shalj.wanandroid.data.local.article.ArticleDatabase
@@ -17,7 +19,8 @@ import javax.inject.Inject
 class ArticleDetailVM @Inject constructor(
     private val articleDb: ArticleDatabase,
     api: Api,
-) : BaseArticleViewModel(articleDb, api) {
+    dataStore: DataStore<Preferences>
+) : BaseArticleViewModel(articleDb, api, dataStore) {
 
     private val _article = MutableStateFlow(ArticleEntity())
     private val _showMoreMenu = MutableStateFlow(false)
@@ -25,9 +28,10 @@ class ArticleDetailVM @Inject constructor(
     val state = combine(
         _article,
         isUpdatingLikeState,
-        _showMoreMenu
-    ) { article, isUpdatingLikeState, showMoreMenu ->
-        ArticleDetailState(article, isUpdatingLikeState, showMoreMenu)
+        _showMoreMenu,
+        needLogin
+    ) { article, isUpdatingLikeState, showMoreMenu, needLogin->
+        ArticleDetailState(article, isUpdatingLikeState, showMoreMenu, needLogin)
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
 

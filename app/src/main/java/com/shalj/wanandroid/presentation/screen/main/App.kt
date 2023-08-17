@@ -84,6 +84,7 @@ fun App() {
             loginGraph(navController)
             composable(Route.mainScreen) {
                 MainScreen(
+                    login = { navController.navigate(LoginRoute.login) },
                     navigateToSearch = {},
                     navigateToMe = { navController.navigate(Route.meScreen) },
                     navigateToArticleDetailScreen = { article ->
@@ -102,9 +103,11 @@ fun App() {
                 )
             ) {
                 val id = it.arguments?.getInt("id") ?: -1
-                ArticleDetailScreen(id) {
-                    navController.navigateUp()
-                }
+                ArticleDetailScreen(
+                    id,
+                    login = { navController.navigate(LoginRoute.login) },
+                    navigateUp = navController::navigateUp
+                )
             }
             composable(Route.meScreen) {
                 MeScreen(

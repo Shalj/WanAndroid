@@ -24,8 +24,8 @@ class LoginVM @Inject constructor(
     private val userDataStore: DataStore<Preferences>,
     private val api: Api,
 ) : BaseViewModel() {
-    private val _username = MutableStateFlow("shalj")
-    private val _password = MutableStateFlow("shalj123")
+    private val _username = MutableStateFlow("")
+    private val _password = MutableStateFlow("")
     private val _loginSuccess = MutableStateFlow(false)
 
     val state = combine(

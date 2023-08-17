@@ -6,4 +6,5 @@ data class ArticleDetailState(
     val article: ArticleEntity = ArticleEntity(),
     val isUpdatingLikeState: Boolean = false,
     val showMoreMenu: Boolean = false,
+    val needLogin: Boolean = false,
 )

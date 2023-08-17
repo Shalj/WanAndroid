@@ -33,6 +33,7 @@ import androidx.compose.material3.pullrefresh.PullRefreshIndicator
 import androidx.compose.material3.pullrefresh.pullRefresh
 import androidx.compose.material3.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -100,6 +101,7 @@ fun HomeScreenPreview() {
 
 @Composable
 fun HomeScreen(
+    login: () -> Unit = {},
     navigateToSearch: () -> Unit = {},
     navigateToMe: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
@@ -117,6 +119,12 @@ fun HomeScreen(
         onRefresh = { articles.refresh() },
     )
     val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(key1 = uiState.needLogin) {
+        if (uiState.needLogin) {
+            login()
+        }
+    }
 
     Scaffold(
         contentColor = MaterialTheme.colorScheme.background,

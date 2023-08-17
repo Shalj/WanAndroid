@@ -7,6 +7,7 @@ import com.shalj.wanandroid.presentation.components.multistatewidget.MultiStateW
 data class HomeState(
     var multiState: MultiStateWidgetState = MultiStateWidgetState.Loading,
     var banner: List<BannerData> = listOf(),
+    var needLogin: Boolean = false
 )
 
 sealed class HomeEvent {

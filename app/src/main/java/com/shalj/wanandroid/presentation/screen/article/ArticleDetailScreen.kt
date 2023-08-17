@@ -3,6 +3,7 @@ package com.shalj.wanandroid.presentation.screen.article
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.webkit.WebView
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideIn
@@ -54,7 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
-import com.google.accompanist.web.rememberWebViewState
+import com.google.accompanist.web.rememberSaveableWebViewState
 import com.shalj.wanandroid.presentation.components.AnimatedHeart
 import com.shalj.wanandroid.presentation.components.WanSpacer
 import com.shalj.wanandroid.presentation.components.WanTopAppBar
@@ -65,9 +66,9 @@ import com.shalj.wanandroid.utils.logE
 @Composable
 fun ArticleDetailPreview() {
     WanAndroidTheme {
-        ArticleDetailScreen(-1) {
+        ArticleDetailScreen(-1, login = {}, navigateUp = {
 
-        }
+        })
     }
 }
 
@@ -77,16 +78,18 @@ fun ArticleDetailPreview() {
 fun ArticleDetailScreen(
     id: Int?,
     viewModel: ArticleDetailVM = hiltViewModel(),
-    navigateUp: () -> Unit
+    navigateUp: () -> Unit,
+    login: () -> Unit
 ) {
 
     LaunchedEffect(key1 = id) {
         viewModel.onEvent(ArticleDetailEvent.Init(id))
     }
 
+
     val state by viewModel.state.collectAsStateWithLifecycle(initialValue = ArticleDetailState())
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val webviewState = rememberWebViewState(url = state.article.link.orEmpty())
+    val webviewState = rememberSaveableWebViewState()
     var progress by remember {
         mutableFloatStateOf(0f)
     }
@@ -100,6 +103,12 @@ fun ArticleDetailScreen(
             progress = (webviewState.loadingState as LoadingState.Loading).progress
         }
     })
+
+    LaunchedEffect(key1 = state.needLogin) {
+        if (state.needLogin) {
+            login()
+        }
+    }
 
     LaunchedEffect(key1 = state.showMoreMenu) {
         if (state.showMoreMenu) {
@@ -117,7 +126,7 @@ fun ArticleDetailScreen(
                 onBackPressed = navigateUp,
                 actions = {
                     AnimatedHeart(
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier.size(30.dp),
                         isUpdating = state.isUpdatingLikeState,
                         selected = state.article.collect ?: false,
                         onToggle = { viewModel.onEvent(ArticleDetailEvent.CollectArticle(state.article)) }
@@ -159,6 +168,7 @@ fun ArticleDetailScreen(
                             loadWithOverviewMode = true
                             supportZoom()
                         }
+                        it.loadUrl(state.article.link.orEmpty())
                     }
                 )
                 AnimatedVisibility(
