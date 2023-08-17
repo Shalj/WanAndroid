@@ -51,8 +51,16 @@ class HomeViewModel @Inject constructor(
             val result = api.getBannerData()
             withContext(Dispatchers.Main) {
                 when (result) {
-                    is RequestResult.Error -> result.msg
-                    is RequestResult.Success -> _banner.value = result.data
+                    is RequestResult.Error -> {
+                        toast.value = result.msg
+                        _multiState.value = MultiStateWidgetState.Error
+                    }
+
+                    is RequestResult.Success -> {
+                        _banner.value = result.data
+                        _multiState.value =
+                            if (result.data.isEmpty()) MultiStateWidgetState.Empty else MultiStateWidgetState.Content
+                    }
                 }
             }
         }

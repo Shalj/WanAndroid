@@ -40,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -126,14 +127,13 @@ fun HomeScreen(
                 modifier = Modifier
                     .padding(it)
                     .fillMaxSize(),
-                providerState = {
-                    if (refreshState.refreshing || it != MultiStateWidgetState.Content) MultiStateWidgetState.Loading else MultiStateWidgetState.Content
-                },
+                providerState = { uiState.multiState },
             ) {
                 Box(modifier = Modifier.pullRefresh(refreshState)) {
                     val providerPageData = fun(): LazyPagingItems<ArticleEntity> { return articles }
                     val pageData = providerPageData()
                     LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
                         state = lazyListState,
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         contentPadding = PaddingValues(bottom = 20.dp),
@@ -143,21 +143,32 @@ fun HomeScreen(
                             Banner(bannerData = uiState.banner)
                         }
 
-                        //articles
-                        items(
-                            count = pageData.itemCount,
-                            key = { index -> index },
-                        ) { index ->
-                            pageData[index]?.let { data ->
-                                ArticleItem(data,
-                                    onCollectClick = { article ->
-                                        viewModel.onEvent(HomeEvent.CollectArticle(article))
-                                    },
-                                    onClick = { article ->
-                                        viewModel.onEvent(HomeEvent.CollectArticle(article))
-                                        navigateToArticleDetailScreen(article)
-                                    }
-                                )
+                        if (pageData.loadState.refresh is LoadState.Loading && pageData.itemCount == 0) {
+                            item(key = "loadingIndicator") {
+                                Box(modifier = Modifier.fillParentMaxSize()) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.align(Alignment.Center),
+                                        strokeCap = StrokeCap.Round
+                                    )
+                                }
+                            }
+                        } else {
+                            //articles
+                            items(
+                                count = pageData.itemCount,
+                                key = { index -> index },
+                            ) { index ->
+                                pageData[index]?.let { data ->
+                                    ArticleItem(data,
+                                        onCollectClick = { article ->
+                                            viewModel.onEvent(HomeEvent.CollectArticle(article))
+                                        },
+                                        onClick = { article ->
+                                            viewModel.onEvent(HomeEvent.ReadArticle(article))
+                                            navigateToArticleDetailScreen(article)
+                                        }
+                                    )
+                                }
                             }
                         }
                         item {
@@ -168,7 +179,7 @@ fun HomeScreen(
                     }
 
                     PullRefreshIndicator(
-                        refreshing = refreshState.refreshing,
+                        refreshing = refreshState.refreshing && uiState.multiState != MultiStateWidgetState.Loading,
                         state = refreshState,
                         modifier = Modifier.align(Alignment.TopCenter)
                     )

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shalj.wanandroid.R
+import com.shalj.wanandroid.data.local.article.ArticleEntity
 import com.shalj.wanandroid.presentation.screen.main.home.HomeScreen
 import com.shalj.wanandroid.presentation.screen.main.project.ProjectScreen
 import com.shalj.wanandroid.presentation.screen.main.wechat.WechatAccountScreen
@@ -33,7 +34,7 @@ fun MainScreen(
     navigateToSearch: () -> Unit = {},
     navigateToMe: () -> Unit = {},
     mainViewModel: MainViewModel = hiltViewModel(),
-    navigateToArticleDetailScreen: (link: String, title: String) -> Unit
+    navigateToArticleDetailScreen: (ArticleEntity) -> Unit
 ) {
     val items = listOf(
         Pair("主页", R.drawable.ic_main_home),

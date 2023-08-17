@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -21,16 +22,13 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MultiStateWidget(
     modifier: Modifier = Modifier,
-    providerState: (prevState: MultiStateWidgetState) -> MultiStateWidgetState = { MultiStateWidgetState.Content },
+    providerState: () -> MultiStateWidgetState = { MultiStateWidgetState.Content },
     loading: @Composable () -> Unit = { MultiStateWidgetDefault.LoadingWidget() },
     error: @Composable () -> Unit = { MultiStateWidgetDefault.ErrorWidget() },
     empty: @Composable () -> Unit = { MultiStateWidgetDefault.EmptyWidget() },
     content: @Composable () -> Unit
 ) {
-    var state by rememberSaveable {
-        mutableStateOf<MultiStateWidgetState>(MultiStateWidgetState.Content)
-    }
-    state = providerState(state)
+    val state = providerState()
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         when (state) {
             MultiStateWidgetState.Loading -> loading()

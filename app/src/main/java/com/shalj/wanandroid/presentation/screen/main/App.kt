@@ -86,10 +86,10 @@ fun App() {
                 MainScreen(
                     navigateToSearch = {},
                     navigateToMe = { navController.navigate(Route.meScreen) },
-                    navigateToArticleDetailScreen = { link, title ->
+                    navigateToArticleDetailScreen = { article ->
                         navController.navigate(
-                            Route.articleDetail.replace("{link}", link)
-                                .replace("{title}", title)
+                            Route.articleDetail.replace("{link}", article.link.orEmpty())
+                                .replace("{title}", article.title.orEmpty())
                         )
                     }
                 )
